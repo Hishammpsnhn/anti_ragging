@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "752383861914",
+    "project_id": "antiragging-27f01",
+    "storage_bucket": "antiragging-27f01.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:752383861914:android:21059eb151596357532b23",
+        "android_client_info": {
+          "package_name": "com.example.anti_ragging"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1TtFUgHakfQ4GwLdiMZgTU8G1lWDjmFE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
