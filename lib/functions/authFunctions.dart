@@ -8,8 +8,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthServices {
   static signupUser(
       String email, String password, String name,String department,String phone, BuildContext context) async {
-    print(password);
-    print(email);
     try {
 
       UserCredential userCredential = await FirebaseAuth.instance
@@ -18,7 +16,7 @@ class AuthServices {
       await FirebaseAuth.instance.currentUser!.updateDisplayName(name);
       await FirebaseAuth.instance.currentUser!.updateEmail(email);
 
-      await FirestoreServices.saveUser(name, email, userCredential.user!.uid);
+      await FirestoreServices.saveUser(name, email, userCredential.user!.uid, department, phone);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Registration Successful')),
@@ -64,8 +62,6 @@ class AuthServices {
       Navigator.of(context)
           .pushReplacement(MaterialPageRoute(builder: (ctx) => HomeScreen()));
     } on FirebaseAuthException catch (e) {
-      print("e code is +++++++");
-      print(e.code);
       if (e.code == 'invalid-credential') {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('invalid-credential')));

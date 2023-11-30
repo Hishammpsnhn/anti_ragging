@@ -12,17 +12,6 @@ Future main() async {
    await Firebase.initializeApp(
   options: DefaultFirebaseOptions.currentPlatform,
 );
-  // await Firebase.initializeApp();
-  // if (kIsWeb) {
-  //   await Firebase.initializeApp(
-  //       options: FirebaseOptions(
-  //           apiKey: "AIzaSyCP-g8l2uVD97dM1uzRb3JO8EGSo5DclvQ",
-  //           appId: "1:752383861914:web:880d74bcfacb1cb5532b23",
-  //           messagingSenderId: "752383861914",
-  //           projectId: "antiragging-27f01"));
-  // }else{
-  //     await Firebase.initializeApp();
-  // }
   runApp(myApp());
 }
 
@@ -33,6 +22,7 @@ class myApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(primaryColor: Colors.deepOrange),
+      debugShowCheckedModeBanner: false,
       home: SplashPage(),
     );
   }
