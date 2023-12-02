@@ -85,7 +85,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
   Future<void> _clearPreferences() async {
     final _sharedPrefs = await SharedPreferences.getInstance();
     await _sharedPrefs.clear();
