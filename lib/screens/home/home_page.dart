@@ -65,25 +65,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     topRight: Radius.circular(20.0),
                   ),
                 ),
-                child: Column(
-                  children: [
-                    TopBoxes(
-                      totalCases: 10,
-                      pendingCases: 3,
-                      solvedCases: 8,
-                    ),
-                    Expanded(
-                        child: AntiRaggingBoxes()
-                    ),
-                    Center(
-                      child: ValueListenableBuilder(
-                        valueListenable: _counter,
-                        builder: (BuildContext ctx, int newVal, Widget? child) {
-                          return Text('Counter: $newVal');
-                        },
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      TopBoxes(
+                        totalCases: 10,
+                        pendingCases: 3,
+                        solvedCases: 8,
                       ),
-                    ),
-                  ],
+                      AntiRaggingBoxes(),
+                    ],
+                  ),
                 ),
               ),
             ),
