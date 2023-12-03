@@ -1,8 +1,12 @@
+import 'package:anti_ragging/screens/home/ragging_report.dart';
+import 'package:anti_ragging/screens/home/ragging_rule_screen.dart';
 import 'package:anti_ragging/screens/home/report_complaint_form%20.dart';
 import 'package:flutter/material.dart';
 
 class AntiRaggingBoxes extends StatelessWidget {
-  const AntiRaggingBoxes({Key? key}) : super(key: key);
+  final bool? isAdmin;
+
+  const AntiRaggingBoxes({Key? key, this.isAdmin}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +31,17 @@ class AntiRaggingBoxes extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _buildRaggingBox("Click here to lodge a complaint", 'assets/antiRagging.png', () {
+                  if (isAdmin != null && isAdmin!)
+                    (_buildRaggingBox("Click here  to check ragging case report", 'assets/antiRagging.png', () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Ragging_report_Page(),
+                        ),
+                      );
+                    }, context)),
+                  _buildRaggingBox("Click here to lodge a complaint",
+                      'assets/antiRagging.png', () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -37,15 +51,14 @@ class AntiRaggingBoxes extends StatelessWidget {
                   }, context),
                   _buildRaggingBox("Download Anti-Ragging undertaking",
                       'assets/antiRagging.png', () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => ComplaintForm(),
-                    //   ),
-                    // );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Ragging_rule_Page(),
+                      ),
+                    );
                   }, context),
 
-                  //_buildRaggingBox("Box 1", 'assets/antiRagging.png',"ComplaintForm",context),
                 ],
               ),
             ),

@@ -1,8 +1,12 @@
+import 'dart:ffi';
+
 import 'package:anti_ragging/screens/auth/login_page.dart';
 import 'package:anti_ragging/screens/widgets/anit_ragging_boxes.dart';
 import 'package:anti_ragging/screens/widgets/top_boxes.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/physics.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -13,26 +17,57 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   ValueNotifier<int> _counter = ValueNotifier(0);
   User? _user;
+  bool? _isAdmin; // Add a variable to store the user name, for example
 
   @override
   void initState() {
     super.initState();
-    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
       setState(() {
         _user = user;
       });
+
       if (user == null) {
         _clearPreferences();
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => LoginPage()),
         );
+      } else {
+        // Fetch additional user details from Firestore
+        await fetchUserDetailsFromFirestore(user.uid);
       }
     });
   }
 
+  Future<void> fetchUserDetailsFromFirestore(String userId) async {
+    try {
+      // Assuming 'users' is the collection in Firestore where user details are stored
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      if (userSnapshot.exists) {
+        Map<String, dynamic> userData =
+            userSnapshot.data() as Map<String, dynamic>;
+        print(userData);
+        bool isAdmin = userData['admin'] ?? false;
+
+        setState(() {
+          _isAdmin = isAdmin;
+        });
+      } else {
+        print('User document does not exist in Firestore');
+      }
+    } catch (error) {
+      print('Error fetching user details from Firestore: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    //print(_user);
     return Scaffold(
       body: Container(
         color: Colors.black,
@@ -40,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             AppBar(
               backgroundColor: Colors.transparent,
-              title: const Text(
+              title: Text(
                 "CampUs",
                 style: TextStyle(color: Colors.white),
               ),
@@ -73,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         pendingCases: 3,
                         solvedCases: 8,
                       ),
-                      AntiRaggingBoxes(),
+                      AntiRaggingBoxes(isAdmin: _isAdmin),
                     ],
                   ),
                 ),
