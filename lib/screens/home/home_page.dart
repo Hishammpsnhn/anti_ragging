@@ -70,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
     //print(_user);
     return Scaffold(
       body: Container(
-        color: Colors.black,
+        color: Colors.black45,
         child: Column(
           children: [
             AppBar(

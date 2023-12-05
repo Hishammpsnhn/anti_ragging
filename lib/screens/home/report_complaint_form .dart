@@ -6,8 +6,8 @@ class ComplaintForm extends StatefulWidget {
 }
 
 class _ComplaintFormState extends State<ComplaintForm> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _studentController = TextEditingController();
+  final _explantionController = TextEditingController();
   final TextEditingController _complaintTypeController = TextEditingController();
   String selectedComplaintType = 'Ragging';
   DateTime selectedDate = DateTime.now();
@@ -50,11 +50,11 @@ class _ComplaintFormState extends State<ComplaintForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: SingleChildScrollView(
+        backgroundColor: Colors.blueGrey,
+        body: Center(
+        child: SingleChildScrollView(
         child: Container(
-          decoration: const BoxDecoration(color: Colors.grey),
-          child: Padding(
+    child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -62,6 +62,7 @@ class _ComplaintFormState extends State<ComplaintForm> {
                 const SizedBox(),
                 Column(
                   children: [
+                    const SizedBox(height: 25),
                     const Text(
                       'Complaint Form',
                       style: TextStyle(
@@ -88,26 +89,31 @@ class _ComplaintFormState extends State<ComplaintForm> {
                       ),
                       controller: _complaintTypeController,
                     ),
+                    if(selectedComplaintType == 'Ragging')
                     const SizedBox(height: 12),
-                    TextFormField(
-                      readOnly: true,
-                      onTap: () {
-                        _selectDate(context);
-                      },
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        labelText: 'Date',
-                        hintText: 'Select date',
-                        prefixIcon: Icon(Icons.calendar_today),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.0),
+                    if(selectedComplaintType == 'Ragging')
+                      TextFormField(
+                        readOnly: true,
+                        onTap: () {
+                          _selectDate(context);
+                        },
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          labelText: 'Date',
+                          hintText: 'Select date',
+                          prefixIcon: Icon(Icons.calendar_today),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
                         ),
+                        controller: TextEditingController(
+                            text: "${selectedDate.toLocal()}".split(' ')[0]),
                       ),
-                      controller: TextEditingController(
-                          text: "${selectedDate.toLocal()}".split(' ')[0]),
-                    ),
+
+                    if(selectedComplaintType == 'Ragging')
                     const SizedBox(height: 12),
+                    if(selectedComplaintType == 'Ragging')
                     TextFormField(
                       readOnly: true,
                       onTap: () {
@@ -126,15 +132,17 @@ class _ComplaintFormState extends State<ComplaintForm> {
                       controller: TextEditingController(
                           text: "${selectedTime.format(context)}"),
                     ),
+                    if(selectedComplaintType == 'Ragging')
                     const SizedBox(height: 12),
+                    if(selectedComplaintType == 'Ragging')
                     TextField(
-                      controller: _emailController,
+                      controller: _studentController,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
-                        labelText: 'Email',
-                        hintText: 'Enter your email',
-                        prefixIcon: Icon(Icons.email),
+                        labelText: 'Ragging Student Details',
+                        hintText: 'Enter Student Details',
+                        prefixIcon: Icon(Icons.person),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12.0),
                         ),
@@ -142,24 +150,30 @@ class _ComplaintFormState extends State<ComplaintForm> {
                     ),
                     const SizedBox(height: 12),
                     TextField(
-                      controller: _passwordController,
-                      obscureText: true,
+
+                      minLines: 2,
+                      maxLines: null,
+                      controller: _explantionController,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
-                        labelText: 'Password',
-                        hintText: 'Enter your password',
-                        prefixIcon: Icon(Icons.lock),
+                        labelText: 'Explanation',
+                        hintText: 'Enter your Explanation',
+                        prefixIcon: Icon(Icons.details),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12.0),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        primary: Color(0xFFC20BF3),
+                        primary: Colors.indigo,
                         elevation: 5,
+                        padding: EdgeInsets.symmetric(vertical: 10.0,horizontal: 15.0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.0), // Adjust the radius as needed
+                        ),
                       ),
                       onPressed: () {
                         checkLogin(context);
@@ -181,12 +195,14 @@ class _ComplaintFormState extends State<ComplaintForm> {
           ),
         ),
       ),
+    )
     );
+
   }
 
   void checkLogin(BuildContext context) {
-    final _email = _emailController.text;
-    final _password = _passwordController.text;
+    final _email = _studentController.text;
+    final _password = _explantionController.text;
     print('Selected Complaint Type: $selectedComplaintType');
     print('Email: $_email');
     print('Password: $_password');
