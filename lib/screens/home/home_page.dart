@@ -1,13 +1,14 @@
 import 'dart:ffi';
-
 import 'package:anti_ragging/screens/auth/login_page.dart';
 import 'package:anti_ragging/screens/widgets/anit_ragging_boxes.dart';
+import 'package:anti_ragging/screens/widgets/appBar.dart';
 import 'package:anti_ragging/screens/widgets/top_boxes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/physics.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+User? currentUser;
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -43,6 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> fetchUserDetailsFromFirestore(String userId) async {
     try {
       // Assuming 'users' is the collection in Firestore where user details are stored
+      currentUser = FirebaseAuth.instance.currentUser;
       DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(userId)
@@ -70,27 +72,10 @@ class _HomeScreenState extends State<HomeScreen> {
     //print(_user);
     return Scaffold(
       body: Container(
-        color: Colors.black45,
+        color: Colors.black87,
         child: Column(
           children: [
-            AppBar(
-              backgroundColor: Colors.transparent,
-              title: Text(
-                "CampUs",
-                style: TextStyle(color: Colors.white),
-              ),
-              actions: [
-                IconButton(
-                  onPressed: () {
-                    FirebaseAuth.instance.signOut();
-                  },
-                  icon: const Icon(
-                    Icons.exit_to_app,
-                    color: Colors.white,
-                  ),
-                )
-              ],
-            ),
+            App_Bar(logout: true),
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(

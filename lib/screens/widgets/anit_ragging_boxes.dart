@@ -36,7 +36,7 @@ class AntiRaggingBoxes extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Ragging_report_Page(),
+                          builder: (context) => Ragging_reports_Page(),
                         ),
                       );
                     }, context)),
