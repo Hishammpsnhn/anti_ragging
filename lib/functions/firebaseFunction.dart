@@ -23,6 +23,7 @@ class FirestoreServices {
       BuildContext context,
       ) async {
     try {
+      int currentSize = await getTotalCases();
       DocumentReference<Map<String, dynamic>> documentReference =
       await FirebaseFirestore.instance.collection('complaints').add({
         'studentId': userId,
@@ -31,6 +32,8 @@ class FirestoreServices {
         'time': time,
         'studentNames': studentNames,
         'explanation': explanation,
+        'solved':false,
+        'caseNumber': currentSize + 1,
       });
 
       if (documentReference.id.isNotEmpty) {
@@ -55,26 +58,56 @@ class FirestoreServices {
       );
     }
   }
-
-  Future<void> getAllComplaints() async {
+  static Future<List<Map<String, dynamic>>> getAllComplaints() async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
       await FirebaseFirestore.instance.collection('complaints').get();
 
       // Process the querySnapshot to get the documents
-      List<QueryDocumentSnapshot<Map<String, dynamic>>> complaints =
-          querySnapshot.docs;
+      List<Map<String, dynamic>> complaints =
+      querySnapshot.docs.map((complaint) {
+        return complaint.data();
+      }).toList();
 
-      for (QueryDocumentSnapshot<Map<String, dynamic>> complaint in complaints) {
-        // Access data from each document
-        Map<String, dynamic> complaintData = complaint.data();
-        print('Complaint ID: ${complaint.id}');
-        print('Type: ${complaintData['type']}');
-        print('Date: ${complaintData['date']}');
-        // Add more fields as needed
-      }
+      // Sort complaints based on caseNumber in descending order
+      complaints.sort((a, b) {
+        int caseNumberA = a['caseNumber'];
+        int caseNumberB = b['caseNumber'];
+        return caseNumberB.compareTo(caseNumberA); // Compare in reverse order
+      });
+
+      return complaints;
     } catch (e) {
       print('Error getting complaints: $e');
+      return [];
     }
+  }
+
+}
+
+
+
+Future<int> getTotalCases() async {
+  try {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+    await FirebaseFirestore.instance.collection('complaints').get();
+
+    return querySnapshot.size;
+  } catch (e) {
+    throw Exception('Error fetching total cases: $e');
+  }
+}
+
+Future<int> getPendingCasesCount() async {
+  try {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+    await FirebaseFirestore.instance
+        .collection('complaints')
+        .where('solved', isEqualTo: false)
+        .get();
+
+    return querySnapshot.size;
+  } catch (e) {
+    throw Exception('Error fetching pending cases: $e');
   }
 }

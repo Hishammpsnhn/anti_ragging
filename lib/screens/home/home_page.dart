@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'package:anti_ragging/functions/firebaseFunction.dart';
 import 'package:anti_ragging/screens/auth/login_page.dart';
 import 'package:anti_ragging/screens/widgets/anit_ragging_boxes.dart';
 import 'package:anti_ragging/screens/widgets/appBar.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/physics.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 User? currentUser;
 
 class HomeScreen extends StatefulWidget {
@@ -18,7 +20,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   ValueNotifier<int> _counter = ValueNotifier(0);
   User? _user;
-  bool? _isAdmin; // Add a variable to store the user name, for example
+  bool? _isAdmin;
 
   @override
   void initState() {
@@ -88,10 +90,23 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      TopBoxes(
-                        totalCases: 10,
-                        pendingCases: 3,
-                        solvedCases: 8,
+                      // Use FutureBuilder to handle the asynchronous operation
+                      FutureBuilder<List<int>>(
+                        future: Future.wait([getTotalCases(), getPendingCasesCount()]),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else {
+                            // snapshot.data is a List<int> containing totalCases and pendingCases
+                            return TopBoxes(
+                              totalCases: snapshot.data?[0] ?? 0,
+                              pendingCases: snapshot.data?[1] ?? 0,
+                              solvedCases: (snapshot.data?[0] ?? 0) - (snapshot.data?[1] ?? 0),
+                            );
+                          }
+                        },
                       ),
                       AntiRaggingBoxes(isAdmin: _isAdmin),
                     ],

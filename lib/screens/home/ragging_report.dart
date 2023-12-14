@@ -1,3 +1,4 @@
+import 'package:anti_ragging/functions/firebaseFunction.dart';
 import 'package:anti_ragging/screens/home/ragging_details.dart';
 import 'package:anti_ragging/screens/widgets/appBar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,20 +22,14 @@ class _Ragging_report_PageState extends State<Ragging_reports_Page> {
   }
 
   Future<void> getAllComplaints() async {
-    try {
-      QuerySnapshot<Map<String, dynamic>> querySnapshot =
-      await FirebaseFirestore.instance.collection('complaints').get();
+    List<Map<String, dynamic>> fetchedComplaints =
+    await FirestoreServices.getAllComplaints();
 
-      setState(() {
-        // Process the querySnapshot to get the documents
-        complaints = querySnapshot.docs.map((complaint) {
-          return complaint.data();
-        }).toList();
-      });
-    } catch (e) {
-      print('Error getting complaints: $e');
-    }
+    setState(() {
+      complaints = fetchedComplaints;
+    });
   }
+
 
   // Function to get icon based on complaint type
   Icon getIconForType(String type) {
@@ -68,12 +63,18 @@ class _Ragging_report_PageState extends State<Ragging_reports_Page> {
                 child: ListView.separated(
                   itemBuilder: (ctx, index) {
                     String complaintType = complaints[index]['type'];
+                    String caseNumber = complaints[index]['caseNumber'].toString();
+                    print(caseNumber);
                     return ListTile(
-                      title: Text("Case: ${index + 1}"),
+                      title: Text("Case: ${caseNumber}"),
                       // Add 1 to index
                       subtitle: Text("Type: $complaintType"),
                       leading: getIconForType(complaintType),
-                      trailing: Text("${complaints[index]['time']}"),
+                      //trailing: Text("${complaints[index]['time']}"),
+                      trailing: Icon(
+                        complaints[index]['solved'] ? Icons.check : Icons.close,
+                        color: complaints[index]['solved'] ? Colors.green : Colors.red,
+                      ),
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
