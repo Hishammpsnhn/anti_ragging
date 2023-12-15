@@ -111,3 +111,20 @@ Future<int> getPendingCasesCount() async {
     throw Exception('Error fetching pending cases: $e');
   }
 }
+
+Future<void> updateCaseStatus(int caseNumber) async {
+  try {
+    CollectionReference complaints = FirebaseFirestore.instance.collection('complaints');
+    QuerySnapshot querySnapshot = await complaints.where('caseNumber', isEqualTo: caseNumber).get();
+    if (querySnapshot.docs.isNotEmpty) {
+      DocumentSnapshot complaintDoc = querySnapshot.docs.first;
+      await complaintDoc.reference.update({'solved': true});
+      print('Case $caseNumber marked as solved.');
+    } else {
+      print('Complaint with case number $caseNumber not found.');
+    }
+  } catch (error) {
+    print('Error updating case status: $error');
+  }
+}
+

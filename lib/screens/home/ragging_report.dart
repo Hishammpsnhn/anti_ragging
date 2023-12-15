@@ -24,10 +24,10 @@ class _Ragging_report_PageState extends State<Ragging_reports_Page> {
   Future<void> getAllComplaints() async {
     List<Map<String, dynamic>> fetchedComplaints =
     await FirestoreServices.getAllComplaints();
-
     setState(() {
       complaints = fetchedComplaints;
     });
+
   }
 
 
@@ -64,6 +64,7 @@ class _Ragging_report_PageState extends State<Ragging_reports_Page> {
                   itemBuilder: (ctx, index) {
                     String complaintType = complaints[index]['type'];
                     String caseNumber = complaints[index]['caseNumber'].toString();
+                    String desc = complaints[index]['explanation'].toString();
                     print(caseNumber);
                     return ListTile(
                       title: Text("Case: ${caseNumber}"),
@@ -81,6 +82,13 @@ class _Ragging_report_PageState extends State<Ragging_reports_Page> {
                             builder: (ctx) {
                               return Ragging_Details_page(
                                 name: complaints[index]['studentNames'],
+                                caseNumber:caseNumber,
+                                desc: desc,
+                                complaintType:complaintType,
+                                date:complaints[index]['date'],
+                                time:complaints[index]['time'],
+                                studentNames:complaints[index]['studentNames'],
+
                               );
                             },
                           ),
