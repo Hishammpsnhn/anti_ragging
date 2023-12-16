@@ -2,6 +2,7 @@ import 'dart:ffi';
 import 'package:anti_ragging/functions/firebaseFunction.dart';
 import 'package:anti_ragging/screens/auth/login_page.dart';
 import 'package:anti_ragging/screens/widgets/anit_ragging_boxes.dart';
+import 'package:anti_ragging/screens/widgets/anti_raggint_helpline.dart';
 import 'package:anti_ragging/screens/widgets/appBar.dart';
 import 'package:anti_ragging/screens/widgets/top_boxes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -18,6 +19,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
   ValueNotifier<int> _counter = ValueNotifier(0);
   User? _user;
   bool? _isAdmin;
@@ -38,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       } else {
         // Fetch additional user details from Firestore
+       // updateComplaintsCount();
         await fetchUserDetailsFromFirestore(user.uid);
       }
     });
@@ -68,7 +71,8 @@ class _HomeScreenState extends State<HomeScreen> {
       print('Error fetching user details from Firestore: $error');
     }
   }
-
+  int totalCases = 0;
+  int pendingCases = 0;
   @override
   Widget build(BuildContext context) {
     //print(_user);
@@ -99,16 +103,20 @@ class _HomeScreenState extends State<HomeScreen> {
                           } else if (snapshot.hasError) {
                             return Text('Error: ${snapshot.error}');
                           } else {
+                            totalCases = snapshot.data?[0] ?? 0;
+                            pendingCases = snapshot.data?[1] ?? 0;
+
                             // snapshot.data is a List<int> containing totalCases and pendingCases
                             return TopBoxes(
-                              totalCases: snapshot.data?[0] ?? 0,
-                              pendingCases: snapshot.data?[1] ?? 0,
-                              solvedCases: (snapshot.data?[0] ?? 0) - (snapshot.data?[1] ?? 0),
+                              totalCases: totalCases,
+                              pendingCases: pendingCases,
+                              solvedCases: totalCases - pendingCases,
                             );
                           }
                         },
                       ),
                       AntiRaggingBoxes(isAdmin: _isAdmin),
+                      AntiRaggingHelpline(),
                     ],
                   ),
                 ),
@@ -124,4 +132,23 @@ class _HomeScreenState extends State<HomeScreen> {
     final _sharedPrefs = await SharedPreferences.getInstance();
     await _sharedPrefs.clear();
   }
-}
+
+//   void updateComplaintsCount() async {
+//     setState(() {
+//       // This is where you might want to trigger some asynchronous operation
+//       // to update the complaints list or any other data in your home page.
+//       // You can call the methods like getTotalCases(), getPendingCasesCount()
+//       // or any other logic you have to refresh your data.
+//
+//       // For example, if you want to refresh the total and pending cases:
+//       Future.wait([getTotalCases(), getPendingCasesCount()]).then((result) {
+//         setState(() {
+//           totalCases = result[0];
+//           pendingCases = result[1];
+//         });
+//       });
+//
+//       // If you have other data to update, you can add similar logic here.
+//     });
+//   }
+ }

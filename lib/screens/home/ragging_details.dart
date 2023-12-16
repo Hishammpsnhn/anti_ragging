@@ -1,8 +1,9 @@
 import 'package:anti_ragging/functions/firebaseFunction.dart';
 import 'package:anti_ragging/screens/widgets/appBar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class Ragging_Details_page extends StatelessWidget {
+class Ragging_Details_page extends StatefulWidget {
   final Key? key;
   final String name;
   final String caseNumber;
@@ -11,6 +12,8 @@ class Ragging_Details_page extends StatelessWidget {
   final date;
   final time;
   final studentNames;
+  final solved;
+  final studentId;
 
   Ragging_Details_page(
       {this.key,
@@ -20,8 +23,23 @@ class Ragging_Details_page extends StatelessWidget {
       required this.complaintType,
       this.date,
       this.studentNames,
+      required this.updateComplaintsList, // Add this line
+      this.solved,
+      this.studentId,
       this.time})
       : super(key: key);
+  final VoidCallback updateComplaintsList;
+  @override
+  State<Ragging_Details_page> createState() => _Ragging_Details_pageState();
+}
+
+class _Ragging_Details_pageState extends State<Ragging_Details_page> {
+ // Add this line
+  String studentName = '';
+
+  String department = '';
+
+  String phoneNumber = '';
 
   onPressed(BuildContext context) {
     showDialog(
@@ -38,12 +56,11 @@ class Ragging_Details_page extends StatelessWidget {
               child: Text("Cancel"),
             ),
             TextButton(
-              onPressed: () {
-                updateCaseStatus(int.parse(caseNumber));
-                Navigator.pop(context);
-                FirestoreServices.getAllComplaints();
+              onPressed: () async {
+                await updateCaseStatus(int.parse(widget.caseNumber));
                 Navigator.pop(context);
                 Navigator.pop(context);
+                widget.updateComplaintsList();
               },
               child: Text("OK"),
             ),
@@ -52,6 +69,7 @@ class Ragging_Details_page extends StatelessWidget {
       },
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,7 +93,7 @@ class Ragging_Details_page extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Case $caseNumber",
+                      "Case ${widget.caseNumber}",
                       style: TextStyle(
                         fontSize: 30.0, // Set the desired text size
                         fontWeight:
@@ -83,7 +101,7 @@ class Ragging_Details_page extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 10.0),
-                    Text(complaintType),
+                    Text(widget.complaintType),
                     SizedBox(height: 10.0),
                     Text(
                       "Explanation :",
@@ -91,29 +109,30 @@ class Ragging_Details_page extends StatelessWidget {
                           TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                     ),
                     Text(
-                      desc,
+                      widget.desc,
                       style: TextStyle(
                         fontSize: 18.0, // Set the desired text size
                         fontWeight:
                             FontWeight.normal, // Set the desired font weight
                       ),
                     ),
-                    if (studentNames.isNotEmpty) SizedBox(height: 10.0),
-                    if (studentNames.isNotEmpty)
+                    if (widget.studentNames.isNotEmpty) SizedBox(height: 10.0),
+                    if (widget.studentNames.isNotEmpty)
                       Text(
                         "Ragging Students Names :",
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w700),
                       ),
-                    Text(" $studentNames"),
-                    if (studentNames.isNotEmpty) SizedBox(height: 10.0),
+                    Text(" ${widget.studentNames}"),
+                    if (widget.studentNames.isNotEmpty) SizedBox(height: 10.0),
                     Text(
                       "Date and Time :",
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                     ),
-                    Text("$date , $time"),
+                    Text("${widget.date} , ${widget.time}"),
                     SizedBox(height: 10.0),
+                    if (!widget.solved)
                       Container(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -135,27 +154,53 @@ class Ragging_Details_page extends StatelessWidget {
                         ),
                       ),
                     SizedBox(height: 10.0),
-
-                      Container(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            primary: Colors.blue, // Background color
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(8.0), // Border radius
-                            ),
-                          ),
-                          child: Text(
-                            "GET STUDENT DETAILS",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Colors.white70),
+                    Container(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          await getStudentDetails();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.blue, // Background color
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(8.0), // Border radius
                           ),
                         ),
+                        child: Text(
+                          "GET STUDENT DETAILS",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.white70),
+                        ),
                       ),
+                    ),
+                    SizedBox(height: 10.0),
+                    if(studentName.isNotEmpty)
+                    Text(
+                      'Student Name: $studentName',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if(department.isNotEmpty)
+                    Text(
+                      'Department: $department',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if(phoneNumber.isNotEmpty)
+                    Text(
+                      'Phone Number: $phoneNumber',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -165,4 +210,15 @@ class Ragging_Details_page extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> getStudentDetails() async {
+    Map<String, dynamic> studentData = await FirestoreServices.getStudentById(widget.studentId);
+    setState(() {
+      studentName = studentData['name'] ?? '';
+      department = studentData['department'] ?? '';
+      phoneNumber = studentData['phoneNumber'] ?? '';
+    });
+  }
+
+
 }

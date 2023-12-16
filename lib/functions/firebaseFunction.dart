@@ -3,7 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class FirestoreServices {
-  static saveUser(String name, email, uid, String department, String phone) async {
+  static saveUser(
+      String name, email, uid, String department, String phone) async {
     await FirebaseFirestore.instance.collection('users').doc(uid).set({
       'email': email,
       'name': name,
@@ -14,25 +15,25 @@ class FirestoreServices {
   }
 
   static Future<void> saveComplaint(
-      String userId,
-      String type,
-      String date,
-      String time,
-      String studentNames,
-      String explanation,
-      BuildContext context,
-      ) async {
+    String userId,
+    String type,
+    String date,
+    String time,
+    String studentNames,
+    String explanation,
+    BuildContext context,
+  ) async {
     try {
       int currentSize = await getTotalCases();
       DocumentReference<Map<String, dynamic>> documentReference =
-      await FirebaseFirestore.instance.collection('complaints').add({
+          await FirebaseFirestore.instance.collection('complaints').add({
         'studentId': userId,
         'type': type,
         'date': date,
         'time': time,
         'studentNames': studentNames,
         'explanation': explanation,
-        'solved':false,
+        'solved': false,
         'caseNumber': currentSize + 1,
       });
 
@@ -58,14 +59,15 @@ class FirestoreServices {
       );
     }
   }
+
   static Future<List<Map<String, dynamic>>> getAllComplaints() async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
-      await FirebaseFirestore.instance.collection('complaints').get();
+          await FirebaseFirestore.instance.collection('complaints').get();
 
       // Process the querySnapshot to get the documents
       List<Map<String, dynamic>> complaints =
-      querySnapshot.docs.map((complaint) {
+          querySnapshot.docs.map((complaint) {
         return complaint.data();
       }).toList();
 
@@ -83,14 +85,24 @@ class FirestoreServices {
     }
   }
 
+// Function to get a student by ID from Firestore
+  static Future<Map<String, dynamic>> getStudentById(String studentId) async {
+    CollectionReference studentsCollection =
+        FirebaseFirestore.instance.collection('users');
+    DocumentReference documentReference = studentsCollection.doc(studentId);
+    DocumentSnapshot documentSnapshot = await documentReference.get();
+    if (documentSnapshot.exists) {
+      return documentSnapshot.data() as Map<String, dynamic>;
+    } else {
+      return {};
+    }
+  }
 }
-
-
 
 Future<int> getTotalCases() async {
   try {
     QuerySnapshot<Map<String, dynamic>> querySnapshot =
-    await FirebaseFirestore.instance.collection('complaints').get();
+        await FirebaseFirestore.instance.collection('complaints').get();
 
     return querySnapshot.size;
   } catch (e) {
@@ -100,8 +112,8 @@ Future<int> getTotalCases() async {
 
 Future<int> getPendingCasesCount() async {
   try {
-    QuerySnapshot<Map<String, dynamic>> querySnapshot =
-    await FirebaseFirestore.instance
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore
+        .instance
         .collection('complaints')
         .where('solved', isEqualTo: false)
         .get();
@@ -114,8 +126,10 @@ Future<int> getPendingCasesCount() async {
 
 Future<void> updateCaseStatus(int caseNumber) async {
   try {
-    CollectionReference complaints = FirebaseFirestore.instance.collection('complaints');
-    QuerySnapshot querySnapshot = await complaints.where('caseNumber', isEqualTo: caseNumber).get();
+    CollectionReference complaints =
+        FirebaseFirestore.instance.collection('complaints');
+    QuerySnapshot querySnapshot =
+        await complaints.where('caseNumber', isEqualTo: caseNumber).get();
     if (querySnapshot.docs.isNotEmpty) {
       DocumentSnapshot complaintDoc = querySnapshot.docs.first;
       await complaintDoc.reference.update({'solved': true});
@@ -127,4 +141,3 @@ Future<void> updateCaseStatus(int caseNumber) async {
     print('Error updating case status: $error');
   }
 }
-

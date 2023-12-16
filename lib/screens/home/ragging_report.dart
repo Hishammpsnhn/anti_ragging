@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Ragging_reports_Page extends StatefulWidget {
-  const Ragging_reports_Page({Key? key}) : super(key: key);
+  const Ragging_reports_Page({Key? key})
+      : super(key: key);
 
   @override
   _Ragging_report_PageState createState() => _Ragging_report_PageState();
@@ -21,15 +22,20 @@ class _Ragging_report_PageState extends State<Ragging_reports_Page> {
     getAllComplaints();
   }
 
-  Future<void> getAllComplaints() async {
-    List<Map<String, dynamic>> fetchedComplaints =
-    await FirestoreServices.getAllComplaints();
-    setState(() {
-      complaints = fetchedComplaints;
-    });
+  // Method to update complaints list
+  void updateComplaintsList() {
+    getAllComplaints();
 
   }
 
+  Future<void> getAllComplaints() async {
+    List<Map<String, dynamic>> fetchedComplaints =
+        await FirestoreServices.getAllComplaints();
+    print(fetchedComplaints);
+    setState(() {
+      complaints = fetchedComplaints;
+    });
+  }
 
   // Function to get icon based on complaint type
   Icon getIconForType(String type) {
@@ -63,7 +69,8 @@ class _Ragging_report_PageState extends State<Ragging_reports_Page> {
                 child: ListView.separated(
                   itemBuilder: (ctx, index) {
                     String complaintType = complaints[index]['type'];
-                    String caseNumber = complaints[index]['caseNumber'].toString();
+                    String caseNumber =
+                        complaints[index]['caseNumber'].toString();
                     String desc = complaints[index]['explanation'].toString();
                     print(caseNumber);
                     return ListTile(
@@ -74,22 +81,26 @@ class _Ragging_report_PageState extends State<Ragging_reports_Page> {
                       //trailing: Text("${complaints[index]['time']}"),
                       trailing: Icon(
                         complaints[index]['solved'] ? Icons.check : Icons.close,
-                        color: complaints[index]['solved'] ? Colors.green : Colors.red,
+                        color: complaints[index]['solved']
+                            ? Colors.green
+                            : Colors.red,
                       ),
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (ctx) {
                               return Ragging_Details_page(
-                                name: complaints[index]['studentNames'],
-                                caseNumber:caseNumber,
-                                desc: desc,
-                                complaintType:complaintType,
-                                date:complaints[index]['date'],
-                                time:complaints[index]['time'],
-                                studentNames:complaints[index]['studentNames'],
-
-                              );
+                                  updateComplaintsList: updateComplaintsList,
+                                  name: complaints[index]['studentNames'],
+                                  caseNumber: caseNumber,
+                                  desc: desc,
+                                  complaintType: complaintType,
+                                  date: complaints[index]['date'],
+                                  time: complaints[index]['time'],
+                                  studentId:complaints[index]['studentId'],
+                                  studentNames: complaints[index]
+                                      ['studentNames'],
+                                  solved: complaints[index]['solved']);
                             },
                           ),
                         );
