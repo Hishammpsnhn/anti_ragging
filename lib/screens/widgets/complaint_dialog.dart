@@ -71,4 +71,25 @@ class ComplaintDialog {
       },
     );
   }
+
+  static void snackBar(BuildContext context,  SnackBarType type, String text) {
+    Color snackBarColor = Colors.red; // Default color for error
+
+    if (type == SnackBarType.success) {
+      snackBarColor = Colors.green;
+    }else if(type == SnackBarType.error){
+      snackBarColor = Colors.red;
+    }else{
+      snackBarColor = Colors.blue;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(text),
+        backgroundColor: snackBarColor,
+      ),
+    );
+  }
+
 }
+enum SnackBarType { success, error }

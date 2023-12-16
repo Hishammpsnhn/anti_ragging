@@ -8,14 +8,15 @@ class ComplaintForm extends StatefulWidget {
 }
 
 class _ComplaintFormState extends State<ComplaintForm> {
-
   final _studentController = TextEditingController();
   final _explantionController = TextEditingController();
   final TextEditingController _complaintTypeController =
-  TextEditingController();
+      TextEditingController();
   String selectedComplaintType = 'Ragging';
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
+  bool _submitted = false;
+  final _explanationFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -113,7 +114,7 @@ class _ComplaintFormState extends State<ComplaintForm> {
                             ),
                             controller: TextEditingController(
                                 text:
-                                "${selectedDate.toLocal()}".split(' ')[0]),
+                                    "${selectedDate.toLocal()}".split(' ')[0]),
                           ),
                         if (selectedComplaintType == 'Ragging')
                           const SizedBox(height: 12),
@@ -163,8 +164,17 @@ class _ComplaintFormState extends State<ComplaintForm> {
                             labelText: 'Explanation',
                             hintText: 'Enter your Explanation',
                             prefixIcon: Icon(Icons.details),
+                            errorText:
+                                _submitted && _explantionController.text.isEmpty
+                                    ? 'This field is required'
+                                    : null,
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0),
+                              borderSide: BorderSide(
+                                color: _explantionController.text.isEmpty &&
+                                        _submitted
+                                    ? Colors.red
+                                    : Theme.of(context).dividerColor,
+                              ),
                             ),
                           ),
                         ),
@@ -204,19 +214,25 @@ class _ComplaintFormState extends State<ComplaintForm> {
   }
 
   void RegComplaint(BuildContext context) {
-      String userId = currentUser?.uid ?? 'defaultUserId';
-   FirestoreServices.saveComplaint(
+    String userId = currentUser?.uid ?? 'defaultUserId';
+
+    setState(() {
+      _submitted = true;
+    });
+
+    if (_explantionController.text.isEmpty) {
+      _explanationFocusNode.requestFocus();
+      return;
+    }
+
+    FirestoreServices.saveComplaint(
         userId,
         selectedComplaintType,
         selectedDate.toLocal().toString().split(' ')[0],
         selectedTime.format(context),
         _studentController.text,
         _explantionController.text,
-        context
-      );
-
-
-
+        context);
   }
 
   void _showComplaintTypePicker(BuildContext context) async {
