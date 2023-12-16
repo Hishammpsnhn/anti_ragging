@@ -97,6 +97,28 @@ class FirestoreServices {
       return {};
     }
   }
+
+  //get complaint status baseon case number
+  static Future<bool?> findSolvedStatus(
+      int caseNumber, BuildContext context) async {
+    try {
+      CollectionReference complaintsCollection =
+          FirebaseFirestore.instance.collection('complaints');
+      QuerySnapshot querySnapshot = await complaintsCollection
+          .where('caseNumber', isEqualTo: caseNumber)
+          .get();
+      if (querySnapshot.docs.isNotEmpty) {
+        var complaintData =
+            querySnapshot.docs.first.data() as Map<String, dynamic>;
+        return complaintData['solved'] as bool? ?? false;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching solved status: $e');
+      return null;
+    }
+  }
 }
 
 Future<int> getTotalCases() async {

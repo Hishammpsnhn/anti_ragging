@@ -1,38 +1,43 @@
+import 'package:anti_ragging/functions/firebaseFunction.dart';
 import 'package:anti_ragging/screens/home/ragging_report.dart';
 import 'package:anti_ragging/screens/home/ragging_rule_screen.dart';
 import 'package:anti_ragging/screens/home/report_complaint_form%20.dart';
+import 'package:anti_ragging/screens/widgets/complaint_dialog.dart';
 import 'package:flutter/material.dart';
 
 class AntiRaggingBoxes extends StatelessWidget {
   final bool? isAdmin;
+  final _complaintNoController = TextEditingController();
 
-  const AntiRaggingBoxes({Key? key, this.isAdmin}) : super(key: key);
+   AntiRaggingBoxes({Key? key, this.isAdmin}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(14.0),
+      padding: const EdgeInsets.all(10.0),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 18.0),
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 18.0),
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12.0), color: Colors.white),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'ANTI RAGGGING',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
                   if (isAdmin != null && isAdmin!)
-                    (_buildRaggingBox("Click here  to check ragging case report", 'assets/antiRagging.png', () {
+                    (_buildRaggingBox(
+                        "Click here  to check ragging case report",
+                        'assets/antiRagging.png', () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -42,61 +47,60 @@ class AntiRaggingBoxes extends StatelessWidget {
                     }, context)),
                   _buildRaggingBox("Click here to lodge a complaint",
                       'assets/antiRagging.png', () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ComplaintForm(),
-                      ),
-                    );
-                  }, context),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ComplaintForm(),
+                          ),
+                        );
+                      }, context),
                   _buildRaggingBox("Download Anti-Ragging undertaking",
                       'assets/antiRagging.png', () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Ragging_rule_Page(),
-                      ),
-                    );
-                  }, context),
-
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Ragging_rule_Page(),
+                          ),
+                        );
+                      }, context),
                 ],
               ),
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'COMPLAINT STATUS',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 16),
-            Center(
+            const SizedBox(height: 16),
+            const Center(
               child: Text(
                 'Enter Complaint no. to check status',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
             ),
-            SizedBox(height: 12),
-            _Complaint_status()
+            const SizedBox(height: 12),
+            _Complaint_status(context)
           ],
         ),
       ),
     );
   }
 
-  Widget _buildRaggingBox(
-      String text, String imagePath, void Function() onTap, context) {
+  Widget _buildRaggingBox(String text, String imagePath, void Function() onTap,
+      context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 8.0),
-        padding: EdgeInsets.all(8.0),
+        margin: const EdgeInsets.symmetric(horizontal: 8.0),
+        padding: const EdgeInsets.all(8.0),
         width: 180,
         height: 200,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
             colors: [Color(0xffdec9cd), Color(0xffa4aee5)],
             stops: [0.25, 0.75],
             begin: Alignment.topLeft,
@@ -118,7 +122,7 @@ class AntiRaggingBoxes extends StatelessWidget {
               Text(
                 text,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.black54,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -130,48 +134,74 @@ class AntiRaggingBoxes extends StatelessWidget {
       ),
     );
   }
-}
 
-Widget _Complaint_status() {
-  return Container(
-    // Adjust the width according to your preference
-    child: Row(
-      children: [
-        Expanded(
-          child: TextField(
-            //controller: _EmailController,
-            decoration: InputDecoration(
-              labelText: 'Complaint no',
-              hintText: 'complaint no',
-              filled: true,
-              fillColor: Colors.white,
-              prefixIcon: Icon(Icons.numbers),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12.0),
+
+
+  Widget _Complaint_status(BuildContext context) {
+
+    return Container(
+      // Adjust the width according to your preference
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _complaintNoController,
+              decoration: InputDecoration(
+                labelText: 'Complaint no',
+                hintText: 'complaint no',
+                filled: true,
+                fillColor: Colors.white,
+                prefixIcon: const Icon(Icons.numbers),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                    vertical: 10, horizontal: 8), // Adjust the padding
               ),
-              contentPadding: EdgeInsets.symmetric(
-                  vertical: 10, horizontal: 8), // Adjust the padding
             ),
           ),
-        ),
-        SizedBox(width: 30),
-        ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            primary: Colors.blue, // Background color
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.0), // Border radius
+          const SizedBox(width: 30),
+          ElevatedButton(
+            onPressed: () {
+              complaintStatus(context);
+            },
+            style: ElevatedButton.styleFrom(
+              primary: Colors.blue, // Background color
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0), // Border radius
+              ),
+            ),
+            child: const Text(
+              "SUBMIT",
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.white70),
             ),
           ),
-          child: Text(
-            "SUBMIT",
-            style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: Colors.white70),
-          ),
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+  }
+
+  void complaintStatus(BuildContext context) async {
+    final _complaintNo = _complaintNoController.text;
+
+    // Check if _complaintNo is a valid integer
+    if (int.tryParse(_complaintNo) == null) {
+      ComplaintDialog.showInvalidCaseNumberDialog(context);
+      return;
+    }
+
+    bool? solvedStatus = await FirestoreServices.findSolvedStatus(
+        int.tryParse(_complaintNo)!, context);
+
+    if (solvedStatus == null) {
+      ComplaintDialog.showInvalidCaseNumberDialog(context);
+    } else if (!solvedStatus) {
+      ComplaintDialog.showPendingDialog(context, _complaintNo);
+    } else {
+      ComplaintDialog.showSolvedDialog(context, _complaintNo);
+    }
+  }
 }

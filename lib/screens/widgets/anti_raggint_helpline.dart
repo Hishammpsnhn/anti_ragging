@@ -25,7 +25,7 @@ class AntiRaggingHelpline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(14.0),
+      padding: const EdgeInsets.all(10.0),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 18.0),
         decoration: BoxDecoration(
