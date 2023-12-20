@@ -1,4 +1,5 @@
 import 'package:anti_ragging/functions/firebaseFunction.dart';
+import 'package:anti_ragging/screens/home/mentoring_reg.dart';
 import 'package:anti_ragging/screens/home/ragging_report.dart';
 import 'package:anti_ragging/screens/home/ragging_rule_screen.dart';
 import 'package:anti_ragging/screens/home/report_complaint_form%20.dart';
@@ -51,6 +52,15 @@ class AntiRaggingBoxes extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => ComplaintForm(),
+                          ),
+                        );
+                      }, context),
+                  _buildRaggingBox("Mentoring",
+                      'assets/antiRagging.png', () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MentoringPage(),
                           ),
                         );
                       }, context),
