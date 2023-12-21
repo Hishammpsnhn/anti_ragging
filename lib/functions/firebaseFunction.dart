@@ -85,6 +85,30 @@ class FirestoreServices {
     }
   }
 
+  static Future<List<Map<String, dynamic>>> getAllMentors() async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .where('mentor', isEqualTo: true)
+              .get();
+
+      // Process the querySnapshot to get the documents
+      List<Map<String, dynamic>> mentors = querySnapshot.docs.map((mentorDocument) {
+        return {
+          'id': mentorDocument.id, // Document ID
+          ...mentorDocument.data(), // Document data
+        };
+      }).toList();
+
+      print("mentos $mentors");
+      return mentors;
+    } catch (e) {
+      print('Error getting complaints: $e');
+      return [];
+    }
+  }
+
 // Function to get a student by ID from Firestore
   static Future<Map<String, dynamic>> getStudentById(String studentId) async {
     CollectionReference studentsCollection =

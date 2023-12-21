@@ -1,3 +1,4 @@
+import 'package:anti_ragging/functions/firebaseFunction.dart';
 import 'package:anti_ragging/screens/widgets/appBar.dart';
 import 'package:flutter/material.dart';
 
@@ -9,6 +10,24 @@ class MentoringPage extends StatefulWidget {
 }
 
 class _MentoringPageState extends State<MentoringPage> {
+  List<Map<String, dynamic>> mentors = [];
+
+  @override
+  void initState() {
+    super.initState();
+    getAllMentors();
+  }
+
+  Future<void> getAllMentors() async {
+    List<Map<String, dynamic>> fetchedMentors =
+        await FirestoreServices.getAllMentors();
+    print(fetchedMentors);
+    setState(() {
+      mentors = fetchedMentors;
+    });
+  }
+  String selectedMentorId = '';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,7 +36,9 @@ class _MentoringPageState extends State<MentoringPage> {
         constraints: BoxConstraints.expand(),
         child: Column(
           children: [
-            App_Bar(logout: false,),
+            App_Bar(
+              logout: false,
+            ),
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(
@@ -57,8 +78,7 @@ class _MentoringPageState extends State<MentoringPage> {
                             ),
                           ),
                           controller: TextEditingController(
-                              text:
-                              "${selectedDate.toLocal()}".split(' ')[0]),
+                              text: "${selectedDate.toLocal()}".split(' ')[0]),
                         ),
                         const SizedBox(height: 12),
                         TextFormField(
@@ -87,36 +107,68 @@ class _MentoringPageState extends State<MentoringPage> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                    ListView.separated(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemBuilder: (ctx, index) {
-                        // Replace "Name" with the actual name from your data
-                        String name = "Name $index";
-                        return ListTile(
-                          title: Text(name),
-                          subtitle: Text("something"),
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.blue, // Set your desired background color
+                        ListView.separated(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemBuilder: (ctx, index) {
+                            // Replace "Name" with the actual name from your data
+                            String name = mentors[index]['name'];
+                            String phone = mentors[index]['phoneNumber'];
+                            String mentorId = mentors[index]['id'];
+                            return ListTile(
+                              title: Text(name),
+                              subtitle: Text(phone),
+                              leading: CircleAvatar(
+                                backgroundColor: Colors.blue,
+                                // Set your desired background color
+                                child: Text(
+                                  name[0],
+                                  // Display the first letter of the name
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              trailing: selectedMentorId == mentorId
+                                  ? Icon(Icons.check, color: Colors.green) // Display tick icon if selected
+                                  : null,
+                              onTap: () {
+                                setState(() {
+                                  selectedMentorId = mentorId;
+                                });
+                              },
+                            );
+                          },
+                          separatorBuilder: (ctx, index) {
+                            return Divider();
+                          },
+                          itemCount: mentors.length,
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          width: double.infinity, // Make the button full width
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.indigo,
+                              elevation: 5,
+                              padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 25.0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                            ),
+                            onPressed: () {
+                              bookMentor();
+                            },
                             child: Text(
-                              name[0], // Display the first letter of the name
+                              "BOOK MENTOR",
                               style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 18, // Adjust the font size as needed
+                                color: Colors.white, // Set text color to white
                               ),
                             ),
                           ),
-                          trailing: Text("12:00"),
-                          onTap: () {},
-                        );
-                      },
-                      separatorBuilder: (ctx, index) {
-                        return Divider();
-                      },
-                      itemCount: 20,
-                    ),
-
-
+                        ),
                         // ... other form widgets ...
                       ],
                     ),
@@ -129,9 +181,12 @@ class _MentoringPageState extends State<MentoringPage> {
       ),
     );
   }
+  void bookMentor (){
+    print(selectedTime.format((context)));
+    print(selectedDate.toLocal().toString().split(' ')[0]);
+    print(selectedMentorId);
 
-
-
+  }
   DateTime selectedDate = DateTime.now();
 
   TimeOfDay selectedTime = TimeOfDay.now();
@@ -163,5 +218,4 @@ class _MentoringPageState extends State<MentoringPage> {
       });
     }
   }
-
 }
