@@ -1,4 +1,6 @@
 
+import 'dart:ffi';
+
 import 'package:anti_ragging/functions/firebaseFunction.dart';
 import 'package:anti_ragging/screens/auth/login_page.dart';
 import 'package:anti_ragging/screens/widgets/anit_ragging_boxes.dart';
@@ -17,11 +19,12 @@ UserDataModel? userData; // Declare userData as nullable
 
 class UserDataModel {
   String fromTime;
+  bool cell;
   String toTime;
   int noOfAppointment;
 
 
-  UserDataModel({required this.fromTime, required this.toTime,required this.noOfAppointment});
+  UserDataModel({required this.fromTime, required this.toTime,required this.noOfAppointment,required this.cell});
 }
 
 class HomeScreen extends StatefulWidget {
@@ -35,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
   User? _user;
   bool? _isAdmin;
   bool _isMentor = false;
+  bool _cell = false;
 
 
   @override
@@ -82,14 +86,18 @@ class _HomeScreenState extends State<HomeScreen> {
             noOfAppointment: userMap['numberOfSchedules'] ?? 0,
             fromTime: userMap['fromTime'] ?? '',
             toTime: userMap['toTime'] ?? '',
+            cell:userMap['cell'] ?? false
           );
         }
 
         bool isAdmin = userMap['admin'] ?? false;
         bool isMentor = userMap['mentor'] ?? false;
-
+        bool isCell = userMap['cell'] ?? false;
         setState(() {
           _isMentor = isMentor;
+        });
+        setState(() {
+          _cell = isCell;
         });
         setState(() {
           _isAdmin = isAdmin;
@@ -112,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
         color: Colors.black87,
         child: Column(
           children: [
-            App_Bar(logout: true,isMentor: _isMentor),
+            App_Bar(logout: true,isMentor: _isMentor,isCell:_cell),
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(

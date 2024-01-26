@@ -105,7 +105,7 @@ class _Ragging_Details_pageState extends State<Ragging_Details_page> {
                       "Explanation :",
                       style:
                       TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-                    ),
+                     ),
                     Text(
                       widget.desc,
                       style: const TextStyle(
@@ -114,15 +114,16 @@ class _Ragging_Details_pageState extends State<Ragging_Details_page> {
                         FontWeight.normal, // Set the desired font weight
                       ),
                     ),
-                     if (widget.location.isNotEmpty) SizedBox(height: 10.0),
-                    if (widget.location.isNotEmpty)
+                      if (widget.location.isNotEmpty) SizedBox(height: 10.0),
+                     if (widget.location.isNotEmpty)
                       Text(
                         "Location : ",
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w700),
                       ),
+                    if (widget.location.isNotEmpty)
                     Text(" ${widget.location}"),
-                    if (widget.location.isNotEmpty) SizedBox(height: 10.0),
+                     if (widget.location.isNotEmpty) SizedBox(height: 10.0),
                     const Text(
                       "Date and Time :",
                       style:

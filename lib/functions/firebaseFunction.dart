@@ -32,7 +32,8 @@ class FirestoreServices {
 
       if (userSnapshot.exists) {
         // If the user exists, add the user details to the mentoring data
-        Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
+        Map<String, dynamic> userData =
+            userSnapshot.data() as Map<String, dynamic>;
         data['name'] = userData['name'];
         data['department'] = userData['department'];
       }
@@ -42,7 +43,6 @@ class FirestoreServices {
 
     return mentoringData;
   }
-
 
   static saveUser(
       String name, email, uid, String department, String phone) async {
@@ -176,6 +176,24 @@ class FirestoreServices {
     }
   }
 
+  static Future<List<Map<String, dynamic>>> getCellRaggingCase() async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await FirebaseFirestore.instance
+              .collection('complaints')
+              .where('solved', isEqualTo: false)
+              .where('underCell', isEqualTo: true)
+              .get();
+
+      List<Map<String, dynamic>> complaints = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+      return complaints;
+    } catch (e) {
+      print('Error getting complaints: $e');
+      return [];
+    }
+  }
+
 // Function to get a student by ID from Firestore
   static Future<Map<String, dynamic>> getStudentById(String studentId) async {
     CollectionReference studentsCollection =
@@ -303,16 +321,29 @@ Future<int> getPendingCasesCount() async {
   }
 }
 
-Future<int> getMenotringCount(String mentorId) async {
+Future<int> getMenotringCount(String userId, bool isMentor, bool isCell) async {
   try {
-    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore
-        .instance
-        .collection('mentoring')
-        .where('mentorId', isEqualTo: mentorId)
-        .where('isDone', isEqualTo: false)
-        .get();
+    if (isMentor) {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await FirebaseFirestore.instance
+              .collection('mentoring')
+              .where('mentorId', isEqualTo: userId)
+              .where('isDone', isEqualTo: false)
+              .get();
 
-    return querySnapshot.size;
+      return querySnapshot.size;
+    } else if (isCell) {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await FirebaseFirestore.instance
+              .collection('complaints')
+              .where('underCell', isEqualTo: true)
+              .get();
+      print("======= $querySnapshot.size");
+      return querySnapshot.size;
+    } else {
+      // Handle the default case or throw an exception
+      throw Exception('Invalid user type');
+    }
   } catch (e) {
     throw Exception('Error fetching total cases: $e');
   }
@@ -335,10 +366,11 @@ Future<void> updateCaseStatus(int caseNumber) async {
     print('Error updating case status: $error');
   }
 }
+
 Future<void> updateMentoringStatus(String docId) async {
   try {
     CollectionReference mentoringCollection =
-    FirebaseFirestore.instance.collection('mentoring');
+        FirebaseFirestore.instance.collection('mentoring');
 
     await mentoringCollection.doc(docId).update({
       'isDone': true,

@@ -1,23 +1,26 @@
 import 'package:anti_ragging/functions/firebaseFunction.dart';
 import 'package:anti_ragging/screens/home/home_page.dart';
 import 'package:anti_ragging/screens/home/mentoringDetails.dart';
+import 'package:anti_ragging/screens/home/ragging_report.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class App_Bar extends StatelessWidget {
   final bool logout;
   final bool isMentor;
+  final bool isCell;
 
   const App_Bar({
     Key? key,
     required this.logout,
     this.isMentor = false,
+    this.isCell = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<int>(
-      future: isMentor ? getMenotringCount(currentUser!.uid) : Future.value(0),
+      future: isMentor || isCell ? getMenotringCount(currentUser!.uid,isMentor,isCell) : Future.value(0),
       builder: (context, snapshot) {
         int notificationCount = snapshot.data ?? 0;
 
@@ -42,15 +45,28 @@ class App_Bar extends StatelessWidget {
                   color: Colors.white,
                 ),
               ),
-            if (isMentor)
+
+
+
+            if (isMentor == true || isCell == true)
               Stack(
                 children: [
                   IconButton(
                     onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (ctx) => Mentoring_Report_page()),
-                      );
+                      Route<dynamic>? route;
+
+                      if (isCell == true) {
+                        route = MaterialPageRoute(builder: (ctx) => Ragging_reports_Page(isCell: isCell));
+                      } else if (isMentor == true) {
+                        route = MaterialPageRoute(builder: (ctx) => Mentoring_Report_page());
+                      }
+
+                      if (route != null) {
+                        Navigator.of(context).push(route);
+                      }
                     },
+
+
                     icon: const Icon(
                       Icons.notifications,
                       color: Colors.white,

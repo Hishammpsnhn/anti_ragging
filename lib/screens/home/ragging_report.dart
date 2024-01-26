@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Ragging_reports_Page extends StatefulWidget {
-  const Ragging_reports_Page({Key? key})
+  final bool? isCell;
+  const Ragging_reports_Page({Key? key, this.isCell})
       : super(key: key);
 
   @override
@@ -19,7 +20,13 @@ class _Ragging_report_PageState extends State<Ragging_reports_Page> {
   @override
   void initState() {
     super.initState();
-    getAllComplaints();
+    if(widget.isCell != null && widget.isCell!){
+      print("this is 0000000000000000000 cell");
+      getCellReport();
+    }else{
+      print("this is not 0000000000000000000 cell");
+      getAllComplaints();
+    }
   }
 
   // Method to update complaints list
@@ -29,14 +36,25 @@ class _Ragging_report_PageState extends State<Ragging_reports_Page> {
   }
 
   Future<void> getAllComplaints() async {
-    List<Map<String, dynamic>> fetchedComplaints =
-        await FirestoreServices.getAllComplaints();
-    print(fetchedComplaints);
+
+      List<Map<String, dynamic>> fetchedComplaints =
+      await FirestoreServices.getAllComplaints();
+      print(fetchedComplaints);
+
     setState(() {
       complaints = fetchedComplaints;
     });
   }
 
+  Future<void> getCellReport() async {
+    List<Map<String, dynamic>> fetchedComplaints =
+    await FirestoreServices.getCellRaggingCase();
+    print(fetchedComplaints);
+
+    setState(() {
+      complaints = fetchedComplaints;
+    });
+  }
   // Function to get icon based on complaint type
   Icon getIconForType(String type) {
     switch (type.toLowerCase()) {
@@ -74,7 +92,7 @@ class _Ragging_report_PageState extends State<Ragging_reports_Page> {
                     String desc = complaints[index]['explanation'].toString();
                     print(caseNumber);
                     return ListTile(
-                      title: Text("Case: ${caseNumber}"),
+                      title: Text("Case No: ${caseNumber}"),
                       // Add 1 to index
                       subtitle: Text("Type: $complaintType"),
                       leading: getIconForType(complaintType),
