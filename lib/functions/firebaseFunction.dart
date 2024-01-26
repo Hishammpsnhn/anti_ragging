@@ -1,8 +1,49 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class FirestoreServices {
+  static Future<List<Map<String, dynamic>>> getMentoringForLoggedInUser(
+      String mentorId) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('mentoring')
+        .where('mentorId', isEqualTo: mentorId)
+        .where('isDone', isEqualTo: false)
+        .get();
+
+    List<Map<String, dynamic>> mentoringData = [];
+
+    for (QueryDocumentSnapshot<Object?> doc in querySnapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+      // Add the document ID to the data map
+      data['docId'] = doc.id;
+
+      // Get the studentId from the mentoring data
+      String studentId = data['studentId'];
+
+      // Fetch the user details for the student
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(studentId)
+          .get();
+
+      if (userSnapshot.exists) {
+        // If the user exists, add the user details to the mentoring data
+        Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
+        data['name'] = userData['name'];
+        data['department'] = userData['department'];
+      }
+
+      mentoringData.add(data);
+    }
+
+    return mentoringData;
+  }
+
+
   static saveUser(
       String name, email, uid, String department, String phone) async {
     await FirebaseFirestore.instance.collection('users').doc(uid).set({
@@ -10,7 +51,24 @@ class FirestoreServices {
       'name': name,
       'department': department,
       'phoneNumber': phone,
-      'admin': false
+      'admin': false,
+      'fromTime': null,
+      'toTime': null,
+      'numberOfSchedules': 0,
+    });
+  }
+
+  static updateUser(
+    context,
+    String uid,
+    TimeOfDay fromTime,
+    TimeOfDay toTime,
+    int numberOfSchedules,
+  ) async {
+    await FirebaseFirestore.instance.collection('users').doc(uid).update({
+      'fromTime': fromTime.format(context),
+      'toTime': toTime.format(context),
+      'numberOfSchedules': numberOfSchedules,
     });
   }
 
@@ -19,7 +77,7 @@ class FirestoreServices {
     String type,
     String date,
     String time,
-    String studentNames,
+    String location,
     String explanation,
     BuildContext context,
   ) async {
@@ -31,7 +89,7 @@ class FirestoreServices {
         'type': type,
         'date': date,
         'time': time,
-        'studentNames': studentNames,
+        'location': location,
         'explanation': explanation,
         'solved': false,
         'caseNumber': currentSize + 1,
@@ -39,18 +97,26 @@ class FirestoreServices {
 
       if (documentReference.id.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             behavior: SnackBarBehavior.floating,
             backgroundColor: Colors.green,
             margin: EdgeInsets.all(10),
-            content: Text("Submitted successfully"),
+            content:
+                Text("Submitted successfully. Case number: ${currentSize + 1}"),
           ),
         );
         Navigator.pop(context);
+        // final HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('sendNotificationToAdmin');
+        // await callable.call({
+        //   'complaintId': currentSize + 1,
+        // });
+        //
+        // // Subscribe to the admin topic for notifications
+        // FirebaseMessaging.instance.subscribeToTopic('admin');
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.red,
           margin: EdgeInsets.all(10),
@@ -94,7 +160,8 @@ class FirestoreServices {
               .get();
 
       // Process the querySnapshot to get the documents
-      List<Map<String, dynamic>> mentors = querySnapshot.docs.map((mentorDocument) {
+      List<Map<String, dynamic>> mentors =
+          querySnapshot.docs.map((mentorDocument) {
         return {
           'id': mentorDocument.id, // Document ID
           ...mentorDocument.data(), // Document data
@@ -143,6 +210,72 @@ class FirestoreServices {
       return null;
     }
   }
+
+  static Future<void> bookMentoring(
+    String userId,
+    String date,
+    String time,
+    String sheduleTime,
+    String mentorId,
+    BuildContext context,
+  ) async {
+    try {
+      DocumentReference<Map<String, dynamic>> documentReference =
+          await FirebaseFirestore.instance.collection('mentoring').add({
+        'studentId': userId,
+        'date': date,
+        'time': time,
+        'mentorId': mentorId,
+        'isDone': false,
+        "scheduleTime": sheduleTime
+      });
+
+      if (documentReference.id.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.green,
+            margin: EdgeInsets.all(10),
+            content: Text("Booked successfully"),
+          ),
+        );
+        Navigator.pop(context);
+        final DocumentReference userDoc =
+            FirebaseFirestore.instance.collection('users').doc(mentorId);
+        try {
+          await FirebaseFirestore.instance.runTransaction((transaction) async {
+            DocumentSnapshot snapshot = await transaction.get(userDoc);
+
+            if (snapshot.exists) {
+              Map<String, dynamic> userData =
+                  snapshot.data() as Map<String, dynamic>;
+
+              int currentNumberOfSchedules = userData['numberOfSchedules'] ?? 0;
+
+              // Ensure the value doesn't go below zero
+              int newNumberOfSchedules = (currentNumberOfSchedules - 1)
+                  .clamp(0, double.infinity)
+                  .toInt();
+
+              transaction
+                  .update(userDoc, {'numberOfSchedules': newNumberOfSchedules});
+            }
+          });
+        } catch (e) {
+          print('Error decrementing numberOfSchedules: $e');
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.red,
+          margin: EdgeInsets.all(10),
+          content: Text("Something went wrong"),
+        ),
+      );
+    }
+  }
 }
 
 Future<int> getTotalCases() async {
@@ -170,6 +303,21 @@ Future<int> getPendingCasesCount() async {
   }
 }
 
+Future<int> getMenotringCount(String mentorId) async {
+  try {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore
+        .instance
+        .collection('mentoring')
+        .where('mentorId', isEqualTo: mentorId)
+        .where('isDone', isEqualTo: false)
+        .get();
+
+    return querySnapshot.size;
+  } catch (e) {
+    throw Exception('Error fetching total cases: $e');
+  }
+}
+
 Future<void> updateCaseStatus(int caseNumber) async {
   try {
     CollectionReference complaints =
@@ -185,5 +333,19 @@ Future<void> updateCaseStatus(int caseNumber) async {
     }
   } catch (error) {
     print('Error updating case status: $error');
+  }
+}
+Future<void> updateMentoringStatus(String docId) async {
+  try {
+    CollectionReference mentoringCollection =
+    FirebaseFirestore.instance.collection('mentoring');
+
+    await mentoringCollection.doc(docId).update({
+      'isDone': true,
+    });
+
+    print('Mentoring with document ID $docId marked as done.');
+  } catch (error) {
+    print('Error updating mentoring status: $error');
   }
 }

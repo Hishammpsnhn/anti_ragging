@@ -5,36 +5,34 @@ import 'package:flutter/material.dart';
 
 class Ragging_Details_page extends StatefulWidget {
   final Key? key;
-  final String name;
   final String caseNumber;
   final String desc;
   final complaintType;
   final date;
   final time;
-  final studentNames;
   final solved;
   final studentId;
+  final location;
 
-  Ragging_Details_page(
-      {this.key,
-      required this.name,
-      required this.caseNumber,
-      required this.desc,
-      required this.complaintType,
-      this.date,
-      this.studentNames,
-      required this.updateComplaintsList, // Add this line
-      this.solved,
-      this.studentId,
-      this.time})
+  Ragging_Details_page({this.key,
+    required this.caseNumber,
+    required this.desc,
+    required this.complaintType,
+    this.date,
+    this.location,
+    required this.updateComplaintsList, // Add this line
+    this.solved,
+    this.studentId,
+    this.time})
       : super(key: key);
   final VoidCallback updateComplaintsList;
+
   @override
   State<Ragging_Details_page> createState() => _Ragging_Details_pageState();
 }
 
 class _Ragging_Details_pageState extends State<Ragging_Details_page> {
- // Add this line
+  // Add this line
   String studentName = '';
 
   String department = '';
@@ -94,44 +92,44 @@ class _Ragging_Details_pageState extends State<Ragging_Details_page> {
                   children: [
                     Text(
                       "Case ${widget.caseNumber}",
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 30.0, // Set the desired text size
                         fontWeight:
-                            FontWeight.bold, // Set the desired font weight
+                        FontWeight.bold, // Set the desired font weight
                       ),
                     ),
                     SizedBox(height: 10.0),
                     Text(widget.complaintType),
                     SizedBox(height: 10.0),
-                    Text(
+                    const Text(
                       "Explanation :",
                       style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                      TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                     ),
                     Text(
                       widget.desc,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18.0, // Set the desired text size
                         fontWeight:
-                            FontWeight.normal, // Set the desired font weight
+                        FontWeight.normal, // Set the desired font weight
                       ),
                     ),
-                    if (widget.studentNames.isNotEmpty) SizedBox(height: 10.0),
-                    if (widget.studentNames.isNotEmpty)
+                     if (widget.location.isNotEmpty) SizedBox(height: 10.0),
+                    if (widget.location.isNotEmpty)
                       Text(
-                        "Ragging Students Names :",
+                        "Location : ",
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w700),
                       ),
-                    Text(" ${widget.studentNames}"),
-                    if (widget.studentNames.isNotEmpty) SizedBox(height: 10.0),
-                    Text(
+                    Text(" ${widget.location}"),
+                    if (widget.location.isNotEmpty) SizedBox(height: 10.0),
+                    const Text(
                       "Date and Time :",
                       style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                      TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                     ),
                     Text("${widget.date} , ${widget.time}"),
-                    SizedBox(height: 10.0),
+                    const SizedBox(height: 10.0),
                     if (!widget.solved)
                       Container(
                         width: double.infinity,
@@ -141,10 +139,10 @@ class _Ragging_Details_pageState extends State<Ragging_Details_page> {
                             primary: Colors.green, // Background color
                             shape: RoundedRectangleBorder(
                               borderRadius:
-                                  BorderRadius.circular(8.0), // Border radius
+                              BorderRadius.circular(8.0), // Border radius
                             ),
                           ),
-                          child: Text(
+                          child: const Text(
                             "SOLVED",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -164,7 +162,7 @@ class _Ragging_Details_pageState extends State<Ragging_Details_page> {
                           primary: Colors.blue, // Background color
                           shape: RoundedRectangleBorder(
                             borderRadius:
-                                BorderRadius.circular(8.0), // Border radius
+                            BorderRadius.circular(8.0), // Border radius
                           ),
                         ),
                         child: Text(
@@ -178,29 +176,29 @@ class _Ragging_Details_pageState extends State<Ragging_Details_page> {
                     ),
                     SizedBox(height: 10.0),
                     if(studentName.isNotEmpty)
-                    Text(
-                      'Student Name: $studentName',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                      Text(
+                        'Student Name: $studentName',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
                     if(department.isNotEmpty)
-                    Text(
-                      'Department: $department',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                      Text(
+                        'Department: $department',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
                     if(phoneNumber.isNotEmpty)
-                    Text(
-                      'Phone Number: $phoneNumber',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                      Text(
+                        'Phone Number: $phoneNumber',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),
@@ -212,7 +210,8 @@ class _Ragging_Details_pageState extends State<Ragging_Details_page> {
   }
 
   Future<void> getStudentDetails() async {
-    Map<String, dynamic> studentData = await FirestoreServices.getStudentById(widget.studentId);
+    Map<String, dynamic> studentData = await FirestoreServices.getStudentById(
+        widget.studentId);
     setState(() {
       studentName = studentData['name'] ?? '';
       department = studentData['department'] ?? '';

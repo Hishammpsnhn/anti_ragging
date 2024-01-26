@@ -1,4 +1,6 @@
+import 'package:anti_ragging/functions/firebase_api.dart';
 import 'package:anti_ragging/screens/home/report_complaint_form%20.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:anti_ragging/screens/auth/login_page.dart';
 import 'package:anti_ragging/screens/auth/register_page.dart';
@@ -11,6 +13,8 @@ Future main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  FirebaseService firebaseService = FirebaseService();
+  await firebaseService.initializeFirebase();
   runApp(MyApp());
 }
 

@@ -1,9 +1,10 @@
-import 'dart:ffi';
+
 import 'package:anti_ragging/functions/firebaseFunction.dart';
 import 'package:anti_ragging/screens/auth/login_page.dart';
 import 'package:anti_ragging/screens/widgets/anit_ragging_boxes.dart';
 import 'package:anti_ragging/screens/widgets/anti_raggint_helpline.dart';
 import 'package:anti_ragging/screens/widgets/appBar.dart';
+import 'package:anti_ragging/screens/widgets/mentorTimeSchedule.dart';
 import 'package:anti_ragging/screens/widgets/top_boxes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,16 @@ import 'package:flutter/physics.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 User? currentUser;
+UserDataModel? userData; // Declare userData as nullable
+
+class UserDataModel {
+  String fromTime;
+  String toTime;
+  int noOfAppointment;
+
+
+  UserDataModel({required this.fromTime, required this.toTime,required this.noOfAppointment});
+}
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -23,6 +34,8 @@ class _HomeScreenState extends State<HomeScreen> {
   ValueNotifier<int> _counter = ValueNotifier(0);
   User? _user;
   bool? _isAdmin;
+  bool _isMentor = false;
+
 
   @override
   void initState() {
@@ -41,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
       } else {
         // Fetch additional user details from Firestore
        // updateComplaintsCount();
+        print(user);
         await fetchUserDetailsFromFirestore(user.uid);
       }
     });
@@ -48,7 +62,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> fetchUserDetailsFromFirestore(String userId) async {
     try {
-      // Assuming 'users' is the collection in Firestore where user details are stored
       currentUser = FirebaseAuth.instance.currentUser;
       DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
           .collection('users')
@@ -56,11 +69,28 @@ class _HomeScreenState extends State<HomeScreen> {
           .get();
 
       if (userSnapshot.exists) {
-        Map<String, dynamic> userData =
-            userSnapshot.data() as Map<String, dynamic>;
-        print(userData);
-        bool isAdmin = userData['admin'] ?? false;
+        Map<String, dynamic> userMap =
+        userSnapshot.data() as Map<String, dynamic>;
+        print("$userMap");
 
+        if (userData != null) {
+          userData!.fromTime = userMap['fromTime'] ?? '';
+          userData!.toTime = userMap['toTime'] ?? '';
+        } else {
+          // If userData is null, create a new instance
+          userData = UserDataModel(
+            noOfAppointment: userMap['numberOfSchedules'] ?? 0,
+            fromTime: userMap['fromTime'] ?? '',
+            toTime: userMap['toTime'] ?? '',
+          );
+        }
+
+        bool isAdmin = userMap['admin'] ?? false;
+        bool isMentor = userMap['mentor'] ?? false;
+
+        setState(() {
+          _isMentor = isMentor;
+        });
         setState(() {
           _isAdmin = isAdmin;
         });
@@ -71,6 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
       print('Error fetching user details from Firestore: $error');
     }
   }
+
   int totalCases = 0;
   int pendingCases = 0;
   @override
@@ -81,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
         color: Colors.black87,
         child: Column(
           children: [
-            App_Bar(logout: true),
+            App_Bar(logout: true,isMentor: _isMentor),
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(
@@ -116,6 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                       AntiRaggingBoxes(isAdmin: _isAdmin),
+                      if(_isMentor)  MentorTimeSchedule(),
                       AntiRaggingHelpline(),
                     ],
                   ),

@@ -91,15 +91,15 @@ class _Ragging_report_PageState extends State<Ragging_reports_Page> {
                             builder: (ctx) {
                               return Ragging_Details_page(
                                   updateComplaintsList: updateComplaintsList,
-                                  name: complaints[index]['studentNames'],
+                                  // name: complaints[index]['studentNames'],
                                   caseNumber: caseNumber,
                                   desc: desc,
                                   complaintType: complaintType,
                                   date: complaints[index]['date'],
                                   time: complaints[index]['time'],
                                   studentId:complaints[index]['studentId'],
-                                  studentNames: complaints[index]
-                                      ['studentNames'],
+                                  location: complaints[index]
+                                      ['location'],
                                   solved: complaints[index]['solved']);
                             },
                           ),

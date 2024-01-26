@@ -17,7 +17,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _DepartmentController = TextEditingController();
   final _AdmissionNumberController = TextEditingController();
   bool _loading = false;
-  String _selectedDepartment = 'CS';
+  String? _selectedDepartment;
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +127,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       const SizedBox(height: 10),
                       DropdownButtonFormField<String>(
                         value: _selectedDepartment,
-                        items: ['CS', 'History', 'Commerce', 'Science', 'BVoc']
+                        items: ['CS', 'History', 'Commerce', 'Science', 'BVoc','Faculty']
                             .map((department) {
                           return DropdownMenuItem<String>(
                             value: department,
@@ -159,6 +159,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                       const SizedBox(height: 10),
+                      if(_selectedDepartment != 'Faculty')
                       TextField(
                         controller: _AdmissionNumberController,
                         decoration: InputDecoration(
@@ -266,24 +267,25 @@ class _RegisterPageState extends State<RegisterPage> {
     setState(() {
       _loading = true;
     });
+
     final _username = _UsernameController.text;
     final _password = _PasswordController.text;
-    final _cofirmPassword = _ConfirmPasswordController.text;
+    final _confirmPassword = _ConfirmPasswordController.text;
     final _phoneNumber = _PhoneController.text;
     final _email = _EmailController.text;
     final _department = _selectedDepartment;
     final _admissionNumber = _AdmissionNumberController.text;
 
-    if (_password == _cofirmPassword) {
+    if (_password == _confirmPassword) {
       if (_areAllFieldsNotEmpty([
-        _username,
-        _password,
-        _cofirmPassword,
-        _phoneNumber,
-        _email,
-        _department,
-        _admissionNumber,
-      ])) {
+            _username,
+            _password,
+            _confirmPassword,
+            _phoneNumber,
+            _email,
+            if(_department != 'Faculty') _admissionNumber,
+          ]) &&
+          _department != null) {
         await AuthServices.signupUser(
           _email,
           _password,
@@ -294,11 +296,17 @@ class _RegisterPageState extends State<RegisterPage> {
         );
       } else {
         ComplaintDialog.snackBar(
-            context, SnackBarType.error, "Fill all fields");
+          context,
+          SnackBarType.error,
+          "Fill all required fields",
+        );
       }
     } else {
-      ComplaintDialog.snackBar(context, SnackBarType.error,
-          "Password Doesn't match Confirm Password");
+      ComplaintDialog.snackBar(
+        context,
+        SnackBarType.error,
+        "Password doesn't match Confirm Password",
+      );
     }
 
     setState(() {

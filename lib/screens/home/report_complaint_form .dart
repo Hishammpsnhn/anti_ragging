@@ -8,7 +8,7 @@ class ComplaintForm extends StatefulWidget {
 }
 
 class _ComplaintFormState extends State<ComplaintForm> {
-  final _studentController = TextEditingController();
+  final _locationController = TextEditingController();
   final _explantionController = TextEditingController();
   final TextEditingController _complaintTypeController =
       TextEditingController();
@@ -141,13 +141,13 @@ class _ComplaintFormState extends State<ComplaintForm> {
                           const SizedBox(height: 12),
                         if (selectedComplaintType == 'Ragging')
                           TextField(
-                            controller: _studentController,
+                            controller: _locationController,
                             decoration: InputDecoration(
                               filled: true,
                               fillColor: Colors.white,
-                              labelText: 'Ragging Student Details',
-                              hintText: 'Enter Student Details',
-                              prefixIcon: Icon(Icons.person),
+                              labelText: 'Ragging Location',
+                              hintText: 'Eg: near Library ',
+                              prefixIcon: Icon(Icons.location_on),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12.0),
                               ),
@@ -230,7 +230,7 @@ class _ComplaintFormState extends State<ComplaintForm> {
         selectedComplaintType,
         selectedDate.toLocal().toString().split(' ')[0],
         selectedTime.format(context),
-        _studentController.text,
+        _locationController.text,
         _explantionController.text,
         context);
   }

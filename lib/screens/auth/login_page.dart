@@ -121,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
                         checkLogin(context);
                       },
                       child: _loading
-                          ? CircularProgressIndicator(
+                          ?const  CircularProgressIndicator(
                               valueColor:
                                   AlwaysStoppedAnimation<Color>(Colors.white),
                             )
