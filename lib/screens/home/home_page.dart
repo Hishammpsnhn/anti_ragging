@@ -1,4 +1,3 @@
-
 import 'dart:ffi';
 
 import 'package:anti_ragging/functions/firebaseFunction.dart';
@@ -16,15 +15,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 User? currentUser;
 UserDataModel? userData; // Declare userData as nullable
+bool? _isAdmin;
 
 class UserDataModel {
   String fromTime;
   bool cell;
+  bool admin;
   String toTime;
   int noOfAppointment;
 
-
-  UserDataModel({required this.fromTime, required this.toTime,required this.noOfAppointment,required this.cell});
+  UserDataModel(
+      {required this.fromTime,
+      required this.toTime,
+      required this.admin,
+      required this.noOfAppointment,
+      required this.cell});
 }
 
 class HomeScreen extends StatefulWidget {
@@ -33,13 +38,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   ValueNotifier<int> _counter = ValueNotifier(0);
   User? _user;
-  bool? _isAdmin;
+
   bool _isMentor = false;
   bool _cell = false;
-
 
   @override
   void initState() {
@@ -57,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       } else {
         // Fetch additional user details from Firestore
-       // updateComplaintsCount();
+        // updateComplaintsCount();
         print(user);
         await fetchUserDetailsFromFirestore(user.uid);
       }
@@ -74,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (userSnapshot.exists) {
         Map<String, dynamic> userMap =
-        userSnapshot.data() as Map<String, dynamic>;
+            userSnapshot.data() as Map<String, dynamic>;
         print("$userMap");
 
         if (userData != null) {
@@ -83,11 +86,11 @@ class _HomeScreenState extends State<HomeScreen> {
         } else {
           // If userData is null, create a new instance
           userData = UserDataModel(
-            noOfAppointment: userMap['numberOfSchedules'] ?? 0,
-            fromTime: userMap['fromTime'] ?? '',
-            toTime: userMap['toTime'] ?? '',
-            cell:userMap['cell'] ?? false
-          );
+              noOfAppointment: userMap['numberOfSchedules'] ?? 0,
+              fromTime: userMap['fromTime'] ?? '',
+              toTime: userMap['toTime'] ?? '',
+              cell: userMap['cell'] ?? false,
+              admin:userMap['admin'] ?? false);
         }
 
         bool isAdmin = userMap['admin'] ?? false;
@@ -112,6 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   int totalCases = 0;
   int pendingCases = 0;
+
   @override
   Widget build(BuildContext context) {
     //print(_user);
@@ -120,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
         color: Colors.black87,
         child: Column(
           children: [
-            App_Bar(logout: true,isMentor: _isMentor,isCell:_cell),
+            App_Bar(logout: true, isMentor: _isMentor, isCell: _cell),
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(
@@ -135,9 +139,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       // Use FutureBuilder to handle the asynchronous operation
                       FutureBuilder<List<int>>(
-                        future: Future.wait([getTotalCases(), getPendingCasesCount()]),
+                        future: Future.wait(
+                            [getTotalCases(), getPendingCasesCount()]),
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
                             return CircularProgressIndicator();
                           } else if (snapshot.hasError) {
                             return Text('Error: ${snapshot.error}');
@@ -155,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                       AntiRaggingBoxes(isAdmin: _isAdmin),
-                      if(_isMentor)  MentorTimeSchedule(),
+                      if (_isMentor) MentorTimeSchedule(),
                       AntiRaggingHelpline(),
                     ],
                   ),
@@ -191,4 +197,4 @@ class _HomeScreenState extends State<HomeScreen> {
 //       // If you have other data to update, you can add similar logic here.
 //     });
 //   }
- }
+}

@@ -116,6 +116,7 @@ class _Ragging_report_PageState extends State<Ragging_reports_Page> {
                                   date: complaints[index]['date'],
                                   time: complaints[index]['time'],
                                   studentId:complaints[index]['studentId'],
+                                  underCell:complaints[index]['underCell'],
                                   location: complaints[index]
                                       ['location'],
                                   solved: complaints[index]['solved']);

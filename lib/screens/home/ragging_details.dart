@@ -1,4 +1,5 @@
 import 'package:anti_ragging/functions/firebaseFunction.dart';
+import 'package:anti_ragging/screens/home/home_page.dart';
 import 'package:anti_ragging/screens/widgets/appBar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -12,18 +13,21 @@ class Ragging_Details_page extends StatefulWidget {
   final time;
   final solved;
   final studentId;
+  final underCell;
   final location;
 
-  Ragging_Details_page({this.key,
-    required this.caseNumber,
-    required this.desc,
-    required this.complaintType,
-    this.date,
-    this.location,
-    required this.updateComplaintsList, // Add this line
-    this.solved,
-    this.studentId,
-    this.time})
+  Ragging_Details_page(
+      {this.key,
+      required this.caseNumber,
+      required this.desc,
+      required this.complaintType,
+      this.date,
+      this.location,
+      this.underCell,
+      required this.updateComplaintsList, // Add this line
+      this.solved,
+      this.studentId,
+      this.time})
       : super(key: key);
   final VoidCallback updateComplaintsList;
 
@@ -58,7 +62,51 @@ class _Ragging_Details_pageState extends State<Ragging_Details_page> {
                 await updateCaseStatus(int.parse(widget.caseNumber));
                 Navigator.pop(context);
                 Navigator.pop(context);
-                widget.updateComplaintsList();
+                if (userData?.admin == true) widget.updateComplaintsList();
+                if (userData?.cell == true) Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Successfully Solved!'),
+                    duration: Duration(seconds: 3),
+                    // Adjust the duration as needed
+                    backgroundColor: Colors.green,
+                    // Set your desired background color
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                );
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  forwardPress(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Forward "),
+          content: Text("Are you sure you send to anti raggin cell?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () async {
+                await FirestoreServices.updateUserToForward(
+                    int.parse(widget.caseNumber));
+                Navigator.pop(context);
+                Navigator.pop(context);
+                if (userData?.admin == true) widget.updateComplaintsList();
               },
               child: Text("OK"),
             ),
@@ -95,7 +143,7 @@ class _Ragging_Details_pageState extends State<Ragging_Details_page> {
                       style: const TextStyle(
                         fontSize: 30.0, // Set the desired text size
                         fontWeight:
-                        FontWeight.bold, // Set the desired font weight
+                            FontWeight.bold, // Set the desired font weight
                       ),
                     ),
                     SizedBox(height: 10.0),
@@ -104,34 +152,101 @@ class _Ragging_Details_pageState extends State<Ragging_Details_page> {
                     const Text(
                       "Explanation :",
                       style:
-                      TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-                     ),
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                    ),
                     Text(
                       widget.desc,
                       style: const TextStyle(
                         fontSize: 18.0, // Set the desired text size
                         fontWeight:
-                        FontWeight.normal, // Set the desired font weight
+                            FontWeight.normal, // Set the desired font weight
                       ),
                     ),
-                      if (widget.location.isNotEmpty) SizedBox(height: 10.0),
-                     if (widget.location.isNotEmpty)
+                    if (widget.location.isNotEmpty) SizedBox(height: 10.0),
+                    if (widget.location.isNotEmpty)
                       Text(
                         "Location : ",
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w700),
                       ),
-                    if (widget.location.isNotEmpty)
-                    Text(" ${widget.location}"),
-                     if (widget.location.isNotEmpty) SizedBox(height: 10.0),
+                    if (widget.location.isNotEmpty) Text(" ${widget.location}"),
+                    if (widget.location.isNotEmpty) SizedBox(height: 10.0),
                     const Text(
                       "Date and Time :",
                       style:
-                      TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                     ),
                     Text("${widget.date} , ${widget.time}"),
                     const SizedBox(height: 10.0),
-                    if (!widget.solved)
+                    const Text(
+                      "Case Status :",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                    ),
+                    Text(
+                      widget.solved
+                          ? "Solved"
+                          : (widget.underCell
+                              ? "Under Anti-Ragging Cell"
+                              : "Pending"),
+                    ),
+                    const SizedBox(height: 10.0),
+                    if (!widget.underCell && !widget.solved)
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              //opacity: widget.complaintType != 'Ragging' ? 0.5 : 1.0, // Adjust the opacity value as needed
+                              child: ElevatedButton(
+                                onPressed: widget.complaintType != 'Ragging'
+                                    ? null
+                                    : () => forwardPress(context),
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.green, // Background color
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        8.0), // Border radius
+                                  ),
+                                ),
+                                child: const Text(
+                                  "FORWARD",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          SizedBox(width: 16),
+                          // Add some spacing between the buttons
+                          Expanded(
+                            child: Container(
+                              child: ElevatedButton(
+                                onPressed: () => onPressed(context),
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.green, // Background color
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        8.0), // Border radius
+                                  ),
+                                ),
+                                child: const Text(
+                                  "SOLVED ?",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    if (!widget.solved && widget.underCell)
                       Container(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -140,15 +255,16 @@ class _Ragging_Details_pageState extends State<Ragging_Details_page> {
                             primary: Colors.green, // Background color
                             shape: RoundedRectangleBorder(
                               borderRadius:
-                              BorderRadius.circular(8.0), // Border radius
+                                  BorderRadius.circular(8.0), // Border radius
                             ),
                           ),
                           child: const Text(
-                            "SOLVED",
+                            "SOLVED ?",
                             style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Colors.white70),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.white70,
+                            ),
                           ),
                         ),
                       ),
@@ -163,7 +279,7 @@ class _Ragging_Details_pageState extends State<Ragging_Details_page> {
                           primary: Colors.blue, // Background color
                           shape: RoundedRectangleBorder(
                             borderRadius:
-                            BorderRadius.circular(8.0), // Border radius
+                                BorderRadius.circular(8.0), // Border radius
                           ),
                         ),
                         child: Text(
@@ -176,7 +292,7 @@ class _Ragging_Details_pageState extends State<Ragging_Details_page> {
                       ),
                     ),
                     SizedBox(height: 10.0),
-                    if(studentName.isNotEmpty)
+                    if (studentName.isNotEmpty)
                       Text(
                         'Student Name: $studentName',
                         style: TextStyle(
@@ -184,7 +300,7 @@ class _Ragging_Details_pageState extends State<Ragging_Details_page> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    if(department.isNotEmpty)
+                    if (department.isNotEmpty)
                       Text(
                         'Department: $department',
                         style: TextStyle(
@@ -192,7 +308,7 @@ class _Ragging_Details_pageState extends State<Ragging_Details_page> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    if(phoneNumber.isNotEmpty)
+                    if (phoneNumber.isNotEmpty)
                       Text(
                         'Phone Number: $phoneNumber',
                         style: TextStyle(
@@ -211,14 +327,12 @@ class _Ragging_Details_pageState extends State<Ragging_Details_page> {
   }
 
   Future<void> getStudentDetails() async {
-    Map<String, dynamic> studentData = await FirestoreServices.getStudentById(
-        widget.studentId);
+    Map<String, dynamic> studentData =
+        await FirestoreServices.getStudentById(widget.studentId);
     setState(() {
       studentName = studentData['name'] ?? '';
       department = studentData['department'] ?? '';
       phoneNumber = studentData['phoneNumber'] ?? '';
     });
   }
-
-
 }

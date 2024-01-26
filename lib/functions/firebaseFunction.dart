@@ -55,6 +55,7 @@ class FirestoreServices {
       'fromTime': null,
       'toTime': null,
       'numberOfSchedules': 0,
+      'underCell': false,
     });
   }
 
@@ -70,6 +71,25 @@ class FirestoreServices {
       'toTime': toTime.format(context),
       'numberOfSchedules': numberOfSchedules,
     });
+  }
+
+  static updateUserToForward(
+    int caseNumber,
+  ) async {
+    try {
+      CollectionReference complaints =
+          FirebaseFirestore.instance.collection('complaints');
+      QuerySnapshot querySnapshot =
+          await complaints.where('caseNumber', isEqualTo: caseNumber).get();
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot complaintDoc = querySnapshot.docs.first;
+        await complaintDoc.reference.update({'underCell': true});
+      } else {
+        print('Complaint with case number $caseNumber not found.');
+      }
+    } catch (error) {
+      print('Error updating case status: $error');
+    }
   }
 
   static Future<void> saveComplaint(
@@ -92,6 +112,7 @@ class FirestoreServices {
         'location': location,
         'explanation': explanation,
         'solved': false,
+        'underCell': false,
         'caseNumber': currentSize + 1,
       });
 
@@ -185,7 +206,8 @@ class FirestoreServices {
               .where('underCell', isEqualTo: true)
               .get();
 
-      List<Map<String, dynamic>> complaints = querySnapshot.docs.map((doc) => doc.data()).toList();
+      List<Map<String, dynamic>> complaints =
+          querySnapshot.docs.map((doc) => doc.data()).toList();
 
       return complaints;
     } catch (e) {
@@ -337,6 +359,7 @@ Future<int> getMenotringCount(String userId, bool isMentor, bool isCell) async {
           await FirebaseFirestore.instance
               .collection('complaints')
               .where('underCell', isEqualTo: true)
+              .where('solved', isEqualTo: false)
               .get();
       print("======= $querySnapshot.size");
       return querySnapshot.size;
