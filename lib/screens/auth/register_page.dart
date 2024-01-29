@@ -31,8 +31,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color.fromARGB(255, 83, 5, 111),
-                  Color.fromARGB(255, 26, 7, 131),
+                  Color(0xFFE5AAF6),
+                  Color(0xFFE1CFE7),
                 ],
               ),
             ),
@@ -49,7 +49,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: Color.fromARGB(255, 111, 20, 136),
                         ),
                       ),
                       const SizedBox(height: 18),
@@ -199,7 +199,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             },
                             child: const Text(
                               'Forgot Password?',
-                              style: TextStyle(color: Colors.white),
+                              style: TextStyle(  color: Color.fromARGB(255, 111, 20, 136),),
                             ),
                           ),
                         ],
@@ -238,7 +238,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     children: [
                       const Text(
                         "Already have an account?",
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(  color: Color.fromARGB(255, 111, 20, 136),),
                       ),
                       TextButton(
                         onPressed: () {
@@ -249,7 +249,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         },
                         child: const Text(
                           'Sign In',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(  color: Color.fromARGB(255, 111, 20, 136),),
                         ),
                       ),
                     ],

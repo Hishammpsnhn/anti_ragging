@@ -38,7 +38,7 @@ class AntiRaggingBoxes extends StatelessWidget {
                   if (isAdmin != null && isAdmin!)
                     (_buildRaggingBox(
                         "Click here  to check ragging case report",
-                        'assets/antiRagging.png', () {
+                        'assets/antiRagging1.png', () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -47,7 +47,7 @@ class AntiRaggingBoxes extends StatelessWidget {
                       );
                     }, context)),
                   _buildRaggingBox("Click here to lodge a complaint",
-                      'assets/antiRagging.png', () {
+                      'assets/complaint-6161776_640.png', () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -56,7 +56,7 @@ class AntiRaggingBoxes extends StatelessWidget {
                         );
                       }, context),
                   _buildRaggingBox("Mentoring",
-                      'assets/antiRagging.png', () {
+                      'assets/download.png', () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -65,7 +65,7 @@ class AntiRaggingBoxes extends StatelessWidget {
                         );
                       }, context),
                   _buildRaggingBox("Download Anti-Ragging undertaking",
-                      'assets/antiRagging.png', () {
+                      'assets/123-1234019_rules-to-follow-hd-png-download.png', () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(

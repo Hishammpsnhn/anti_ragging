@@ -27,8 +27,9 @@ class _LoginPageState extends State<LoginPage> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Color.fromARGB(255, 83, 5, 111),
-                Color.fromARGB(255, 26, 7, 131),
+                Color(0xFFE5AAF6),
+                Color(0xFFE1CFE7),
+
               ],
             ),
           ),
@@ -45,7 +46,7 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(
                         fontSize: 70,
                         fontWeight: FontWeight.w900,
-                        color: Colors.white,
+                        color: Color.fromARGB(255, 111, 20, 136),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -104,7 +105,7 @@ class _LoginPageState extends State<LoginPage> {
                           },
                           child: const Text(
                             'Forgot Password?',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(  color: Color.fromARGB(255, 111, 20, 136),),
                           ),
                         ),
                       ],
@@ -139,7 +140,7 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     Text(
                       "Don't have an account?",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(  color: Color.fromARGB(255, 111, 20, 136),),
                     ),
                     TextButton(
                       onPressed: () {
@@ -151,7 +152,7 @@ class _LoginPageState extends State<LoginPage> {
                       },
                       child: Text(
                         'Sign Up',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(  color: Color.fromARGB(255, 111, 20, 136),),
                       ),
                     ),
                   ],
