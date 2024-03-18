@@ -20,6 +20,7 @@ bool? _isAdmin;
 class UserDataModel {
   String fromTime;
   bool cell;
+  bool main;
   bool admin;
   String toTime;
   int noOfAppointment;
@@ -29,7 +30,8 @@ class UserDataModel {
       required this.toTime,
       required this.admin,
       required this.noOfAppointment,
-      required this.cell});
+      required this.cell,
+      required this.main});
 }
 
 class HomeScreen extends StatefulWidget {
@@ -43,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool _isMentor = false;
   bool _cell = false;
+  bool _main = false;
 
   @override
   void initState() {
@@ -90,18 +93,24 @@ class _HomeScreenState extends State<HomeScreen> {
               fromTime: userMap['fromTime'] ?? '',
               toTime: userMap['toTime'] ?? '',
               cell: userMap['cell'] ?? false,
+              main: userMap['main'] ?? false,
               admin:userMap['admin'] ?? false);
         }
 
         bool isAdmin = userMap['admin'] ?? false;
         bool isMentor = userMap['mentor'] ?? false;
         bool isCell = userMap['cell'] ?? false;
+        bool main = userMap['main'] ?? false;
         setState(() {
           _isMentor = isMentor;
         });
         setState(() {
           _cell = isCell;
         });
+        setState(() {
+          _main = main;
+        });
+
         setState(() {
           _isAdmin = isAdmin;
         });
@@ -160,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           }
                         },
                       ),
-                      AntiRaggingBoxes(isAdmin: _isAdmin,isCell: _cell),
+                      AntiRaggingBoxes(isAdmin: _isAdmin,isCell: _cell,main:_main),
                       if (_isMentor) MentorTimeSchedule(),
                       AntiRaggingHelpline(),
                     ],

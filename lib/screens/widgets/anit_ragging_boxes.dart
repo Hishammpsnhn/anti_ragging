@@ -1,4 +1,5 @@
 import 'package:anti_ragging/functions/firebaseFunction.dart';
+import 'package:anti_ragging/main.dart';
 import 'package:anti_ragging/screens/home/mentoring_reg.dart';
 import 'package:anti_ragging/screens/home/ragging_report.dart';
 import 'package:anti_ragging/screens/home/ragging_rule_screen.dart';
@@ -9,9 +10,10 @@ import 'package:flutter/material.dart';
 class AntiRaggingBoxes extends StatelessWidget {
   final bool? isAdmin;
   final bool? isCell;
+  final bool? main;
   final _complaintNoController = TextEditingController();
 
-   AntiRaggingBoxes({Key? key, this.isAdmin,this.isCell}) : super(key: key);
+   AntiRaggingBoxes({Key? key, this.isAdmin,this.isCell,this.main}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -47,10 +49,10 @@ class AntiRaggingBoxes extends StatelessWidget {
                       ),
                     );
                   }, context)),
-                  if (isAdmin != null && isAdmin!)
+                  if (isAdmin == true)
                     (_buildRaggingBox(
-                        "Click here  to check ragging case report",
-                        'assets/antiRagging1.png', () {
+                        "Click here  to check new complaints",
+                        'assets/istockphoto-598802688-612x612.png', () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -58,7 +60,7 @@ class AntiRaggingBoxes extends StatelessWidget {
                         ),
                       );
                     }, context)),
-                  if (isAdmin == false  )
+                  if (main == false  )
                   _buildRaggingBox("Click here to lodge a complaint",
                       'assets/complaint-6161776_640.png', () {
                         Navigator.push(
@@ -68,7 +70,7 @@ class AntiRaggingBoxes extends StatelessWidget {
                           ),
                         );
                       }, context),
-                  if ( isAdmin ==false)
+                  if ( main == false)
                   _buildRaggingBox("Mentoring",
                       'assets/download.png', () {
                         Navigator.push(
