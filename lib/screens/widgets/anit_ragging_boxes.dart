@@ -8,9 +8,10 @@ import 'package:flutter/material.dart';
 
 class AntiRaggingBoxes extends StatelessWidget {
   final bool? isAdmin;
+  final bool? isCell;
   final _complaintNoController = TextEditingController();
 
-   AntiRaggingBoxes({Key? key, this.isAdmin}) : super(key: key);
+   AntiRaggingBoxes({Key? key, this.isAdmin,this.isCell}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +36,17 @@ class AntiRaggingBoxes extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
+                  if(isCell == true)
+                  (_buildRaggingBox(
+                      "Click here  to check ragging case report",
+                      'assets/antiRagging1.png', () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Ragging_reports_Page(isCell: isCell),
+                      ),
+                    );
+                  }, context)),
                   if (isAdmin != null && isAdmin!)
                     (_buildRaggingBox(
                         "Click here  to check ragging case report",
@@ -46,6 +58,7 @@ class AntiRaggingBoxes extends StatelessWidget {
                         ),
                       );
                     }, context)),
+                  if (isAdmin == false  )
                   _buildRaggingBox("Click here to lodge a complaint",
                       'assets/complaint-6161776_640.png', () {
                         Navigator.push(
@@ -55,6 +68,7 @@ class AntiRaggingBoxes extends StatelessWidget {
                           ),
                         );
                       }, context),
+                  if ( isAdmin ==false)
                   _buildRaggingBox("Mentoring",
                       'assets/download.png', () {
                         Navigator.push(

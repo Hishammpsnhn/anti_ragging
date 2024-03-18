@@ -160,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           }
                         },
                       ),
-                      AntiRaggingBoxes(isAdmin: _isAdmin),
+                      AntiRaggingBoxes(isAdmin: _isAdmin,isCell: _cell),
                       if (_isMentor) MentorTimeSchedule(),
                       AntiRaggingHelpline(),
                     ],
