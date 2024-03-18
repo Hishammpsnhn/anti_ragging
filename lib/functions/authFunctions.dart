@@ -10,8 +10,15 @@ class AuthServices {
   static signupUser(String email, String password, String name,
       String department, String phone, BuildContext context) async {
     try {
+      print("============================================");
+        print(email);
+        print(password);
+      print(name);
+      print(phone);
+      print(department);
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
+      print(userCredential);
 
       await FirebaseAuth.instance.currentUser!.updateDisplayName(name);
       await FirebaseAuth.instance.currentUser!.updateEmail(email);
